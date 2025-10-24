@@ -106,8 +106,10 @@ class _SortPageState extends State<SortPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Lottie.network(
-                    'https://lottie.host/122ad3bc-1037-4dde-96ea-aeb4141cc68b/b7WgjSge1D.json',
+                Lottie.asset(
+                    'assets/animations/sort.json',
+                    repeat: true,
+                    animate: true,
                     height: 350,
                     width: 350
                 ),

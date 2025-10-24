@@ -110,6 +110,7 @@ class _AddPageState extends State<AddPage> {
               'Add',
               style: TextStyle(
                 color: Colors.black,
+                fontSize: 16
               ),
             ),
           ),
@@ -122,7 +123,7 @@ class _AddPageState extends State<AddPage> {
           SingleChildScrollView(
             child: Center(
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 0, horizontal: 24),
+                padding: EdgeInsets.symmetric(vertical: 0, horizontal: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -282,96 +283,94 @@ class _AddPageState extends State<AddPage> {
               height: 60,
               color: Colors.grey[300],
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Padding(
-                    padding: EdgeInsets.only(left: screenWidth * 0.03),
-                    child: TextButton(
-                      onPressed: () {
-                        if (redAvgs.isEmpty && greenAvgs.isEmpty && blueAvgs.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                "All colors cleared!",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              backgroundColor: Colors.redAccent,
-                              duration: Duration(seconds: 2),
-                              behavior: SnackBarBehavior.floating,
-                              margin: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
+                  SizedBox(width: 12,),
+                  TextButton(
+                    onPressed: () {
+                      if (redAvgs.isEmpty && greenAvgs.isEmpty && blueAvgs.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              "All colors cleared!",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.white),
                             ),
-                          );
-                        } else {
-                          setState(() {
-                            redAvgs.clear();
-                            greenAvgs.clear();
-                            blueAvgs.clear();
-                          });
-                        }
-                      },
-                      child: Text(
-                        'Clear',
-                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                      )
-                    )
-                  ),
-                  Padding(
-                      padding: EdgeInsets.only(left: screenWidth * 0.01),
-                      child: TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            'Save',
-                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                          ))),
-                  Spacer(),
-                  Padding(
-                    padding: EdgeInsets.only(right: screenWidth * 0.03),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: () {
-                        if (redAvgs.length < 2) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                "Add more than 1 color!",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              backgroundColor: Colors.redAccent,
-                              duration: Duration(seconds: 2),
-                              behavior: SnackBarBehavior.floating,
-                              margin: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
-                            ),
-                          );
-                          return;
-                        }
-
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const SortPage(),
-                            settings: RouteSettings(
-                              arguments: {
-                                'redAvgs': redAvgs,
-                                'greenAvgs': greenAvgs,
-                                'blueAvgs': blueAvgs,
-                              },
-                            ),
+                            backgroundColor: Colors.redAccent,
+                            duration: Duration(seconds: 2),
+                            behavior: SnackBarBehavior.floating,
+                            margin: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
                           ),
                         );
-                      },
-                      child: Text(
-                        "Sort",
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      )
+                      } else {
+                        setState(() {
+                          redAvgs.clear();
+                          greenAvgs.clear();
+                          blueAvgs.clear();
+                        });
+                      }
+                    },
+                    child: Text(
+                      'Clear',
+                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
+                    )
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      'Save',
+                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
+                    )
+                  ),
+
+                  Spacer(),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
-                  )
+                    onPressed: () {
+                      if (redAvgs.length < 2) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "Add more than 1 color!",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            backgroundColor: Colors.redAccent,
+                            duration: Duration(seconds: 2),
+                            behavior: SnackBarBehavior.floating,
+                            margin: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
+                          ),
+                        );
+                        return;
+                      }
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SortPage(),
+                          settings: RouteSettings(
+                            arguments: {
+                              'redAvgs': redAvgs,
+                              'greenAvgs': greenAvgs,
+                              'blueAvgs': blueAvgs,
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "Sort",
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                      textAlign: TextAlign.center,
+                    )
+                  ),
+                  SizedBox(width: 12,),
                 ],
               ),
             ),

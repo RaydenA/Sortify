@@ -100,8 +100,10 @@ class _DetectPageState extends State<DetectPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // SizedBox(height: screenHeight *0.25,),
-                Lottie.network(
-                  'https://lottie.host/3237117f-45b5-4dd2-b584-ad5e837fbbcb/gHVr5f6gMY.json',
+                Lottie.asset(
+                  'assets/animations/detect.json',
+                  repeat: true,
+                  animate: true,
                   height: 200,
                   width: 200
                 ),
