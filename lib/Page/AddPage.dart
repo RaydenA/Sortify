@@ -111,7 +111,6 @@ class _AddPageState extends State<AddPage> {
               'Add',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 16,
               ),
             ),
           ),
@@ -122,12 +121,12 @@ class _AddPageState extends State<AddPage> {
         child: Stack(children: [
           SingleChildScrollView(
             child: Center(
-              child: SizedBox(
-                width: screenWidth * 0.9,
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 0, horizontal: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: screenHeight * 0.025),
+                    SizedBox(height: screenHeight * 0.02),
                     // 🟩 Tampilan container warna
                     Container(
                       decoration: BoxDecoration(
@@ -173,7 +172,7 @@ class _AddPageState extends State<AddPage> {
                       ),
                     ),
 
-                    SizedBox(height: screenHeight * 0.025),
+                    SizedBox(height: screenHeight * 0.02),
                     // GridView tampilan warna dan gauge
                     GridView.builder(
                       shrinkWrap: true,
