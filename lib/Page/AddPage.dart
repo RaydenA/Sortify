@@ -43,17 +43,80 @@ class _AddPageState extends State<AddPage> {
       appBar: AppBar(
         toolbarHeight: 60,
         backgroundColor: Color(0xFF509AC2),
-        shadowColor: Colors.black.withOpacity(0.1),
-        leading: Padding(
-          padding: EdgeInsets.only(left: screenWidth * 0.03),
-          child: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            iconSize: 25,
-            icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
-          ),
+        shadowColor: Colors.black.withOpacity(0.2),
+        leading:
+        IconButton(
+          color: const Color(0xFFFFFFFF),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back_rounded),
         ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              if (redAvgs.length >= maxColors) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      "Maximum colors reached!",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    backgroundColor: Colors.redAccent,
+                    duration: Duration(seconds: 2),
+                    behavior: SnackBarBehavior.floating,
+                    margin: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
+                  ),
+                );
+                return;
+              }
+
+              // Buka halaman deteksi dan tunggu hasilnya
+              Color? detectedColor = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => DetectPage(),
+                ),
+              );
+
+              // Kalau dapat warna, validasi kemiripan
+              if (detectedColor != null) {
+                if (isColorSimilar(detectedColor)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        "This color already exist!",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor: Colors.redAccent,
+                      duration: Duration(seconds: 2),
+                      behavior: SnackBarBehavior.floating,
+                      margin: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
+                    ),
+                  );
+                  return; // jangan tambah warna
+                }
+
+                // Kalau tidak mirip, simpan ke list
+                setState(() {
+                  redAvgs.add(detectedColor.red);
+                  greenAvgs.add(detectedColor.green);
+                  blueAvgs.add(detectedColor.blue);
+                });
+              }
+            },
+            child: const Text(
+              'Add',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ],
+
       ),
       body: SafeArea(
         child: Stack(children: [
@@ -64,7 +127,7 @@ class _AddPageState extends State<AddPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: screenHeight * 0.02),
+                    SizedBox(height: screenHeight * 0.025),
                     // 🟩 Tampilan container warna
                     Container(
                       decoration: BoxDecoration(
@@ -109,74 +172,8 @@ class _AddPageState extends State<AddPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: screenHeight * 0.01),
-                    // Tombol tambah warna
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          // Validasi jumlah warna
-                          if (redAvgs.length >= maxColors) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  "Maximum colors reached!",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                backgroundColor: Colors.redAccent,
-                                duration: Duration(seconds: 2),
-                                behavior: SnackBarBehavior.floating,
-                                margin: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
-                              ),
-                            );
-                            return;
-                          }
 
-                          // Buka halaman deteksi dan tunggu hasilnya
-                          Color? detectedColor = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => DetectPage(),
-                            ),
-                          );
-
-                          // Kalau dapat warna, validasi kemiripan
-                          if (detectedColor != null) {
-                            if (isColorSimilar(detectedColor)) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    "This color already exist!",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  backgroundColor: Colors.redAccent,
-                                  duration: Duration(seconds: 2),
-                                  behavior: SnackBarBehavior.floating,
-                                  margin: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
-                                ),
-                              );
-                              return; // jangan tambah warna
-                            }
-
-                            // Kalau tidak mirip, simpan ke list
-                            setState(() {
-                              redAvgs.add(detectedColor.red);
-                              greenAvgs.add(detectedColor.green);
-                              blueAvgs.add(detectedColor.blue);
-                            });
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF509AC2),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: Icon(Icons.add, size: 30, color: Colors.white),
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.01),
+                    SizedBox(height: screenHeight * 0.025),
                     // GridView tampilan warna dan gauge
                     GridView.builder(
                       shrinkWrap: true,
@@ -324,25 +321,27 @@ class _AddPageState extends State<AddPage> {
                     padding: EdgeInsets.only(left: screenWidth * 0.03),
                     child: TextButton(
                       onPressed: () {
-                        setState(() {
-                          redAvgs.clear();
-                          greenAvgs.clear();
-                          blueAvgs.clear();
-                        });
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              "All colors cleared!",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.white),
+                        if (redAvgs.isEmpty && greenAvgs.isEmpty && blueAvgs.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "All colors cleared!",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              backgroundColor: Colors.redAccent,
+                              duration: Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                              margin: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
                             ),
-                            backgroundColor: Colors.redAccent,
-                            duration: Duration(seconds: 2),
-                            behavior: SnackBarBehavior.floating,
-                            margin: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
-                          ),
-                        );
+                          );
+                        } else {
+                          setState(() {
+                            redAvgs.clear();
+                            greenAvgs.clear();
+                            blueAvgs.clear();
+                          });
+                        }
                       },
                       child: Text(
                         'Clear',
