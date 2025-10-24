@@ -16,9 +16,9 @@ class _HomePageState extends State<Homepage> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 60,
-        backgroundColor: Color(0xFF509AC2),
+        backgroundColor: Colors.white,
         shadowColor: Colors.black.withOpacity(0.2),
-        title: Text("Sortify", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),),
+        title: Text("Sortify", style: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold),),
       ),
 
       body: SafeArea(
@@ -39,19 +39,19 @@ class _HomePageState extends State<Homepage> {
           )
         ),
       ),
-
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(context, '/addPage');
         },
         tooltip: 'Add',
-        backgroundColor: Color(0xFF509AC2),
-        elevation: 0,
+        backgroundColor: Colors.white,
+        elevation: 4,
         shape: const CircleBorder(),
         child: const Icon(
           Icons.add,
-          color: Colors.white,
-          size: 30,
+          color: Colors.black,
+          size: 40,
         ),
       ),
 

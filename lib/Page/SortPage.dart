@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:iotproject/Function/data.dart'; // ambil AppData
+import 'package:lottie/lottie.dart';
 
 class SortPage extends StatefulWidget {
   const SortPage({super.key});
@@ -95,35 +96,45 @@ class _SortPageState extends State<SortPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                statusText,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+      body: SafeArea(
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Lottie.network(
+                    'https://lottie.host/122ad3bc-1037-4dde-96ea-aeb4141cc68b/b7WgjSge1D.json',
+                    height: 350,
+                    width: 350
                 ),
-              ),
-              const SizedBox(height: 40),
-              ElevatedButton(
-                onPressed: stopSorting,
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    shape: const CircleBorder(),
-                    padding: const EdgeInsets.all(15)),
-                child: const Icon(
-                  Icons.stop_rounded,
-                  size: 35,
-                  color: Colors.white,
+                Text(
+                  statusText,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ],
+                SizedBox(height: screenHeight * 0.2,),
+                ElevatedButton(
+                  onPressed: stopSorting,
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      shape: const CircleBorder(),
+                      padding: const EdgeInsets.all(15)),
+                  child: const Icon(
+                    Icons.stop_rounded,
+                    size: 35,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: screenHeight * 0.1,)
+              ],
+            ),
           ),
         ),
       ),

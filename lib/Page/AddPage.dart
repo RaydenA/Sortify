@@ -42,11 +42,10 @@ class _AddPageState extends State<AddPage> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 60,
-        backgroundColor: Color(0xFF509AC2),
-        shadowColor: Colors.black.withOpacity(0.2),
+        backgroundColor: Colors.white,
         leading:
         IconButton(
-          color: const Color(0xFFFFFFFF),
+          color: Colors.black,
           onPressed: () {
             Navigator.pop(context);
           },
@@ -110,7 +109,7 @@ class _AddPageState extends State<AddPage> {
             child: const Text(
               'Add',
               style: TextStyle(
-                color: Colors.white,
+                color: Colors.black,
               ),
             ),
           ),
@@ -118,7 +117,8 @@ class _AddPageState extends State<AddPage> {
 
       ),
       body: SafeArea(
-        child: Stack(children: [
+        child: Stack(
+          children: [
           SingleChildScrollView(
             child: Center(
               child: Padding(
@@ -126,7 +126,7 @@ class _AddPageState extends State<AddPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: screenHeight * 0.02),
+                    SizedBox(height: screenHeight * 0.005),
                     // 🟩 Tampilan container warna
                     Container(
                       decoration: BoxDecoration(
@@ -172,9 +172,22 @@ class _AddPageState extends State<AddPage> {
                       ),
                     ),
 
-                    SizedBox(height: screenHeight * 0.02),
-                    // GridView tampilan warna dan gauge
-                    GridView.builder(
+                    SizedBox(height: screenHeight * 0.03),
+                    
+                    Text('Added Colors', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
+
+                    SizedBox(height: screenHeight * 0.015),
+
+                    (redAvgs.isEmpty && greenAvgs.isEmpty && blueAvgs.isEmpty)
+                        ? SizedBox(
+                      width: screenWidth * 1,
+                      height: screenHeight * 0.45,
+
+                      child: Center(
+                          child: Text('No colors added', style: TextStyle(color: Colors.grey[400]),)
+                      )
+                    )
+                        : GridView.builder(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -207,82 +220,35 @@ class _AddPageState extends State<AddPage> {
                               AspectRatio(
                                 aspectRatio: 1,
                                 child: Container(
-                                  width: double.infinity,
-                                  color: Colors.white,
-                                  child: SfRadialGauge(
-                                    axes: <RadialAxis>[
-                                      RadialAxis(
-                                        radiusFactor: 0.9,
-                                        pointers: <GaugePointer>[
-                                          RangePointer(
-                                            value: r / 255 * 100,
-                                            cornerStyle: CornerStyle.bothFlat,
-                                            color: Colors.red,
-                                          )
-                                        ],
-                                        interval: 5,
-                                        startAngle: 90,
-                                        endAngle: 90,
-                                        showTicks: false,
-                                        showLabels: false,
-                                        annotations: <GaugeAnnotation>[
-                                          GaugeAnnotation(
-                                            positionFactor: 0.065,
-                                            widget:
-                                            Icon(
-                                              Icons.color_lens_rounded,
-                                              color: (r >= 250 && g >= 250 && b >= 250)
-                                              ? Colors.grey[400]
-                                              : color,
-                                              size: 100,
-                                            )
-                                            // Container(
-                                            //   margin: EdgeInsets.all(60),
-                                            //   decoration: BoxDecoration(
-                                            //     color: color,
-                                            //     borderRadius: BorderRadius.circular(10),
-                                            //   ),
-                                            // ),
+                                    width: double.infinity,
+                                    color: Colors.white,
+                                    child: Center(
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(15.0),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: (r <= 10 && g <= 10 && b <= 10)
+                                                    ? Colors.black54  // if RGB = 0
+                                                    : color,
+                                                borderRadius: BorderRadius.circular(80),
+                                              ),
+                                            ),
+                                          ),
+                                          Image.asset(
+                                            'assets/shirt.png',
+                                            scale: 13,
                                           )
                                         ],
                                       ),
-                                      RadialAxis(
-                                        radiusFactor: 0.75,
-                                        pointers: <GaugePointer>[
-                                          RangePointer(
-                                            value: g / 255 * 100,
-                                            cornerStyle: CornerStyle.bothFlat,
-                                            color: Colors.green,
-                                          )
-                                        ],
-                                        interval: 5,
-                                        startAngle: 90,
-                                        endAngle: 90,
-                                        showTicks: false,
-                                        showLabels: false,
-                                      ),
-                                      RadialAxis(
-                                        radiusFactor: 0.6,
-                                        pointers: <GaugePointer>[
-                                          RangePointer(
-                                            value: b / 255 * 100,
-                                            cornerStyle: CornerStyle.bothFlat,
-                                            color: Colors.blue,
-                                          )
-                                        ],
-                                        interval: 5,
-                                        startAngle: 90,
-                                        endAngle: 90,
-                                        showTicks: false,
-                                        showLabels: false,
-                                      )
-                                    ],
-                                  ),
+                                    )
                                 ),
                               ),
                               Expanded(
                                 child: Container(
-                                  color: Color(0xFFE7F2F8),
+                                  color: Colors.grey[300],
                                   child: Center(
                                     child: Text(
                                       'R:$r  G:$g  B:$b',
@@ -301,6 +267,7 @@ class _AddPageState extends State<AddPage> {
                         );
                       },
                     ),
+
                     SizedBox(height: screenHeight * 0.09),
                   ],
                 ),
@@ -313,7 +280,7 @@ class _AddPageState extends State<AddPage> {
             child: Container(
               width: screenWidth * 1,
               height: 60,
-              color: Color(0xFF509AC2),
+              color: Colors.grey[300],
               child: Row(
                 children: [
                   Padding(
@@ -344,7 +311,7 @@ class _AddPageState extends State<AddPage> {
                       },
                       child: Text(
                         'Clear',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                       )
                     )
                   ),
@@ -354,14 +321,14 @@ class _AddPageState extends State<AddPage> {
                           onPressed: () {},
                           child: Text(
                             'Save',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                           ))),
                   Spacer(),
                   Padding(
                     padding: EdgeInsets.only(right: screenWidth * 0.03),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
+                        backgroundColor: Colors.black,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -400,7 +367,7 @@ class _AddPageState extends State<AddPage> {
                       },
                       child: Text(
                         "Sort",
-                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       )
                     ),
@@ -409,7 +376,8 @@ class _AddPageState extends State<AddPage> {
               ),
             ),
           ),
-        ]),
+          ]
+        ),
       ),
     );
   }

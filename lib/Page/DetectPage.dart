@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:iotproject/Function/data.dart'; // ambil AppData
+import 'package:lottie/lottie.dart';
 
 class DetectPage extends StatefulWidget {
   const DetectPage({super.key});
@@ -85,43 +86,57 @@ class _DetectPageState extends State<DetectPage> {
 
   @override
   Widget build(BuildContext context) {
-    final colorDisplay = Color.fromARGB(255, red, green, blue);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    // final colorDisplay = Color.fromARGB(255, red, green, blue);
 
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                isCancelled ? 'Detection cancelled' : 'Detecting color...',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'R: $red  |  G: $green  |  B: $blue',
-                style: const TextStyle(fontSize: 18),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(
-                  color: colorDisplay,
-                  borderRadius: BorderRadius.circular(10),
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // SizedBox(height: screenHeight *0.25,),
+                Lottie.network(
+                  'https://lottie.host/3237117f-45b5-4dd2-b584-ad5e837fbbcb/gHVr5f6gMY.json',
+                  height: 200,
+                  width: 200
                 ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: cancelDetection,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  shape: const CircleBorder(),
-                  padding: const EdgeInsets.all(15),
+                SizedBox(height: screenHeight *0.08,),
+                Text(
+                  isCancelled ? 'Detection cancelled' : 'Detecting color...',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                child: const Icon(Icons.stop_rounded, size: 35, color: Colors.white),
-              ),
-            ],
+                // const SizedBox(height: 16),
+                // Text(
+                //   'R: $red  |  G: $green  |  B: $blue',
+                //   style: const TextStyle(fontSize: 18),
+                // ),
+                // const SizedBox(height: 16),
+                // Container(
+                //   width: 150,
+                //   height: 150,
+                //   decoration: BoxDecoration(
+                //     color: colorDisplay,
+                //     borderRadius: BorderRadius.circular(10),
+                //   ),
+                // ),
+                SizedBox(height: screenHeight *0.2,),
+                ElevatedButton(
+                  onPressed: cancelDetection,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    shape: const CircleBorder(),
+                    padding: const EdgeInsets.all(15),
+                  ),
+                  child: const Icon(Icons.stop_rounded, size: 35, color: Colors.white),
+                ),
+                SizedBox(height: screenHeight * 0.1,)
+              ],
+            ),
           ),
         ),
       ),
