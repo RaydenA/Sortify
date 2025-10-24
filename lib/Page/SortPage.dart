@@ -11,13 +11,25 @@ class SortPage extends StatefulWidget {
 }
 
 class _SortPageState extends State<SortPage> {
-  final AppData data = AppData(); // ambil instance AppData
+  final AppData data = AppData(); // ambil IP dari singleton AppData
+
   bool isSorting = false;
   String statusText = "Ready to sort";
 
+  late List<int> redAvgs;
+  late List<int> greenAvgs;
+  late List<int> blueAvgs;
+
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Ambil data warna dari arguments AddPage
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    redAvgs = List<int>.from(args['redAvgs']);
+    greenAvgs = List<int>.from(args['greenAvgs']);
+    blueAvgs = List<int>.from(args['blueAvgs']);
+
     startSorting();
   }
 
@@ -28,13 +40,13 @@ class _SortPageState extends State<SortPage> {
       statusText = "Starting sorting process...";
     });
 
-    // Ambil list warna dari AppData
+    // buat list warna untuk dikirim ke ESP32
     List<Map<String, int>> colorList = [];
-    for (int i = 0; i < data.redAvgs.length; i++) {
+    for (int i = 0; i < redAvgs.length; i++) {
       colorList.add({
-        "red": data.redAvgs[i],
-        "green": data.greenAvgs[i],
-        "blue": data.blueAvgs[i],
+        "red": redAvgs[i],
+        "green": greenAvgs[i],
+        "blue": blueAvgs[i],
       });
     }
 
@@ -68,12 +80,13 @@ class _SortPageState extends State<SortPage> {
       statusText = "Stopping sorting...";
     });
 
-    try {
-      await http.get(Uri.parse("http://${data.esp32Ip}/stop"));
-      print("Stop signal sent to ESP32");
-    } catch (e) {
+    // kirim sinyal stop tanpa menunggu respons
+    http.get(Uri.parse("http://${data.esp32Ip}/stop")).catchError((e) {
       print("Failed to send stop signal: $e");
-    }
+    });
+
+    // beri jeda 2 detik sebelum kembali ke AddPage
+    await Future.delayed(const Duration(seconds: 1));
 
     if (mounted) {
       Navigator.pop(context);

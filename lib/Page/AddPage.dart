@@ -48,11 +48,6 @@ class _AddPageState extends State<AddPage> {
           padding: EdgeInsets.only(left: screenWidth * 0.03),
           child: IconButton(
             onPressed: () {
-
-              data.redAvgs.clear();
-              data.greenAvgs.clear();
-              data.blueAvgs.clear();
-
               Navigator.pop(context);
             },
             iconSize: 25,
@@ -75,7 +70,7 @@ class _AddPageState extends State<AddPage> {
                       decoration: BoxDecoration(
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withOpacity(0.2),
                             blurRadius: 10,
                             offset: const Offset(4, 4),
                           )
@@ -201,10 +196,9 @@ class _AddPageState extends State<AddPage> {
 
                         return Container(
                           decoration: BoxDecoration(
-                            color: Colors.white,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black.withOpacity(0.2),
                                 blurRadius: 10,
                                 offset: const Offset(4, 4),
                               )
@@ -238,13 +232,21 @@ class _AddPageState extends State<AddPage> {
                                         annotations: <GaugeAnnotation>[
                                           GaugeAnnotation(
                                             positionFactor: 0.065,
-                                            widget: Container(
-                                              margin: EdgeInsets.all(60),
-                                              decoration: BoxDecoration(
-                                                color: color,
-                                                borderRadius: BorderRadius.circular(10),
-                                              ),
-                                            ),
+                                            widget:
+                                            Icon(
+                                              Icons.color_lens_rounded,
+                                              color: (r >= 250 && g >= 250 && b >= 250)
+                                              ? Colors.grey[400]
+                                              : color,
+                                              size: 100,
+                                            )
+                                            // Container(
+                                            //   margin: EdgeInsets.all(60),
+                                            //   decoration: BoxDecoration(
+                                            //     color: color,
+                                            //     borderRadius: BorderRadius.circular(10),
+                                            //   ),
+                                            // ),
                                           )
                                         ],
                                       ),
@@ -384,11 +386,18 @@ class _AddPageState extends State<AddPage> {
                           return;
                         }
 
-                        data.redAvgs = List.from(redAvgs);
-                        data.greenAvgs = List.from(greenAvgs);
-                        data.blueAvgs = List.from(blueAvgs);
-
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => SortPage(),),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SortPage(),
+                            settings: RouteSettings(
+                              arguments: {
+                                'redAvgs': redAvgs,
+                                'greenAvgs': greenAvgs,
+                                'blueAvgs': blueAvgs,
+                              },
+                            ),
+                          ),
                         );
                       },
                       child: Text(

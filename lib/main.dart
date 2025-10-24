@@ -27,8 +27,6 @@ class MyApp extends StatelessWidget {
       routes: {
         '/homePage': (context) => Homepage(),
         '/addPage': (context) => AddPage(),
-        '/detectPage': (context) => DetectPage(),
-        '/sortPage': (context) => SortPage(),
       },
     );
   }

@@ -5,11 +5,6 @@ class AppData {
   AppData._internal();
 
   // IP ESP32 (hardcoded)
-  String esp32Ip = '10.234.21.234';
-
-  // List warna rata-rata
-  List<int> redAvgs = [];
-  List<int> greenAvgs = [];
-  List<int> blueAvgs = [];
+  String esp32Ip = '192.168.31.114';
 }
 
