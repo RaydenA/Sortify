@@ -223,27 +223,40 @@ class _AddPageState extends State<AddPage> {
                                 child: Container(
                                     width: double.infinity,
                                     color: Colors.white,
-                                    child: Center(
-                                      child: Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(15.0),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                color: (r <= 10 && g <= 10 && b <= 10)
-                                                    ? Colors.black54  // if RGB = 0
-                                                    : color,
-                                                borderRadius: BorderRadius.circular(80),
-                                              ),
+                                    child: Stack(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(18.0),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: (r <= 10 && g <= 10 && b <= 10)
+                                                  ? Colors.black54  // if RGB = 0
+                                                  : color,
+                                              borderRadius: BorderRadius.circular(80),
                                             ),
                                           ),
-                                          Image.asset(
+                                        ),
+                                        Align(
+                                          alignment: Alignment.center,
+                                          child: Image.asset(
                                             'assets/shirt.png',
                                             scale: 13,
-                                          )
-                                        ],
-                                      ),
+                                          ),
+                                        ),
+                                        Align(
+                                          alignment: Alignment.topRight,
+                                          child: IconButton(
+                                            onPressed: (){
+                                              setState(() {
+                                                redAvgs.removeAt(index);
+                                                greenAvgs.removeAt(index);
+                                                blueAvgs.removeAt(index);
+                                              });
+                                            },
+                                            icon: Icon(Icons.cancel_rounded, color: Colors.grey[400],)
+                                          ),
+                                        ),
+                                      ],
                                     )
                                 ),
                               ),
