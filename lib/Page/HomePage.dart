@@ -101,7 +101,7 @@ class _HomePageState extends State<Homepage> {
           Navigator.pushNamed(context, '/addPage');
         },
         tooltip: 'Add',
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.grey[200],
         elevation: 4,
         shape: const CircleBorder(),
         child: const Icon(

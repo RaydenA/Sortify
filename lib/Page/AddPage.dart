@@ -13,7 +13,10 @@ class AddPage extends StatefulWidget {
 
 class _AddPageState extends State<AddPage> {
   final AppData data = AppData();
+
+  TextEditingController nameController = TextEditingController();
   // Simpan nilai RGB rata-rata
+  String name = "";
   List<int> redAvgs = [];
   List<int> greenAvgs = [];
   List<int> blueAvgs = [];
@@ -175,7 +178,12 @@ class _AddPageState extends State<AddPage> {
 
                     SizedBox(height: screenHeight * 0.03),
                     
-                    Text('Added Colors', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
+                    Row(
+                      children: [
+                        Text('Added Colors ', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
+                        Text(name.isNotEmpty ? "#$name" : "", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.grey),),
+                      ],
+                    ),
 
                     SizedBox(height: screenHeight * 0.015),
 
@@ -221,43 +229,43 @@ class _AddPageState extends State<AddPage> {
                               AspectRatio(
                                 aspectRatio: 1,
                                 child: Container(
-                                    width: double.infinity,
-                                    color: Colors.white,
-                                    child: Stack(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(18.0),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: (r <= 10 && g <= 10 && b <= 10)
-                                                  ? Colors.black54  // if RGB = 0
-                                                  : color,
-                                              borderRadius: BorderRadius.circular(80),
-                                            ),
+                                  width: double.infinity,
+                                  color: Colors.white,
+                                  child: Stack(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(18.0),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: (r <= 10 && g <= 10 && b <= 10)
+                                                ? Colors.black54  // if RGB = 0
+                                                : color,
+                                            borderRadius: BorderRadius.circular(80),
                                           ),
                                         ),
-                                        Align(
-                                          alignment: Alignment.center,
-                                          child: Image.asset(
-                                            'assets/shirt.png',
-                                            scale: 13,
-                                          ),
+                                      ),
+                                      Align(
+                                        alignment: Alignment.center,
+                                        child: Image.asset(
+                                          'assets/shirt.png',
+                                          scale: 13,
                                         ),
-                                        Align(
-                                          alignment: Alignment.topRight,
-                                          child: IconButton(
-                                            onPressed: (){
-                                              setState(() {
-                                                redAvgs.removeAt(index);
-                                                greenAvgs.removeAt(index);
-                                                blueAvgs.removeAt(index);
-                                              });
-                                            },
-                                            icon: Icon(Icons.cancel_rounded, color: Colors.grey[400],)
-                                          ),
+                                      ),
+                                      Align(
+                                        alignment: Alignment.topRight,
+                                        child: IconButton(
+                                          onPressed: (){
+                                            setState(() {
+                                              redAvgs.removeAt(index);
+                                              greenAvgs.removeAt(index);
+                                              blueAvgs.removeAt(index);
+                                            });
+                                          },
+                                          icon: Icon(Icons.cancel_rounded, color: Colors.grey[400],)
                                         ),
-                                      ],
-                                    )
+                                      ),
+                                    ],
+                                  )
                                 ),
                               ),
                               Expanded(
@@ -330,7 +338,55 @@ class _AddPageState extends State<AddPage> {
                     )
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Save Color Set', style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),),
+                              SizedBox(height: screenHeight*0.01)
+                            ],
+                          ),
+                          content: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minWidth: screenWidth * 0.7,
+                              maxWidth: screenWidth * 0.7
+                            ),
+                            child: TextField(
+                              controller: nameController,
+                              decoration: InputDecoration(
+                                hintText: "e.g. Color1",
+                                border: UnderlineInputBorder(),
+                              ),
+                            ),
+                          ),
+                          actions: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              onPressed: (){
+                                setState(() {
+                                  name = nameController.text.trim();
+                                });
+                                Navigator.pop(context);
+                              }, 
+                              child: Text('Save', style: TextStyle(fontSize: 13, color: Colors.white),)
+                            ),
+                            TextButton(onPressed: (){Navigator.pop(context);}, child: Text('Cancel', style: TextStyle(fontSize: 13, color: Colors.red),)),
+                          ],
+                        ),
+                      );
+                    },
                     child: Text(
                       'Save',
                       style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
