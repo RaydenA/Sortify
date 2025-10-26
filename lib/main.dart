@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:iotproject/Page/SortPage.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iotproject/Page/addPage.dart';
 import 'package:iotproject/Page/HomePage.dart';
-import 'package:iotproject/Page/detectPage.dart';
+import 'Function/data.dart';
 
-void main() {
-  runApp(const MyApp());
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]
+  );
+
+  await Hive.initFlutter();
+  
+  Hive.registerAdapter(ColorSetAdapter());
+  await Hive.openBox<ColorSet>('colorSets');
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {

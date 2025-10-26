@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:iotproject/Function/data.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -8,8 +11,21 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomePageState extends State<Homepage> {
+
+  final box = Hive.box<ColorSet>('colorSets');
+
   @override
   Widget build(BuildContext context) {
+    // Print semua key dan value
+    print("=== Semua key di Hive ===");
+    print(box.keys);
+
+    print("=== Semua values di Hive ===");
+    for (var i = 0; i < box.length; i++) {
+      final colorSet = box.getAt(i);
+      print("Index $i: name=${colorSet?.name}, R=${colorSet?.redAvgs}, G=${colorSet?.greenAvgs}, B=${colorSet?.blueAvgs}");
+    }
+
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -90,6 +106,73 @@ class _HomePageState extends State<Homepage> {
                 Text('Your Colors', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
 
                 SizedBox(height: screenHeight * 0.015),
+
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 1,
+                    mainAxisSpacing: 15,
+                    crossAxisSpacing: 15,
+                    childAspectRatio: 1.75,
+                  ),
+                  itemCount: box.length,
+                  itemBuilder: (context, index) {
+                    final colorSet = box.getAt(index);
+                    final redAvgs = colorSet?.redAvgs ?? [];
+                    final greenAvgs = colorSet?.greenAvgs ?? [];
+                    final blueAvgs = colorSet?.blueAvgs ?? [];
+                    final name = colorSet?.name ?? "";
+
+                    return Container(
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 10,
+                            offset: const Offset(4, 4),
+                          )
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Container atas: Row warna, expand otomatis
+                            Expanded(
+                              child: Row(
+                                children: List.generate(redAvgs.length, (i) {
+                                  final r = redAvgs[i];
+                                  final g = greenAvgs[i];
+                                  final b = blueAvgs[i];
+                                  final color = Color.fromARGB(255, r, g, b);
+
+                                  return Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(color: color),
+                                    ),
+                                  );
+                                }),
+                              ),
+                            ),
+
+                            Container(
+                              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                              height: screenHeight * 0.065,
+                              color: Colors.grey[200],
+                              child: Text('#$name', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
+                SizedBox(height: screenHeight * 0.1),
+
               ],
             ),
           )
@@ -97,8 +180,14 @@ class _HomePageState extends State<Homepage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, '/addPage');
+        onPressed: () async {
+          final result = await Navigator.pushNamed(context, '/addPage');
+
+          if (result == true) {
+            setState(() {
+
+            });
+          }
         },
         tooltip: 'Add',
         backgroundColor: Colors.grey[200],
