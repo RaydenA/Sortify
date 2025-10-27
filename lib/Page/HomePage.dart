@@ -1,4 +1,7 @@
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iotproject/Function/data.dart';
@@ -11,15 +14,28 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomePageState extends State<Homepage> {
-
+  final AppData data = AppData();
   final box = Hive.box<ColorSet>('colorSets');
+
+  Future<String?> getColorName(int r, int g, int b) async {
+    try {
+      final url = Uri.parse('https://www.thecolorapi.com/id?rgb=rgb($r,$g,$b)');
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['name']['value'];
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Print semua key dan value
-    print("=== Semua key di Hive ===");
-    print(box.keys);
-
+    // Print semua value
     print("=== Semua values di Hive ===");
     for (var i = 0; i < box.length; i++) {
       final colorSet = box.getAt(i);
@@ -71,20 +87,22 @@ class _HomePageState extends State<Homepage> {
 
                       SizedBox(width: screenWidth * 0.03,),
 
+
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start, // ⬅️ ini penting!
                         mainAxisAlignment: MainAxisAlignment.center,   // optional biar teks sejajar secara vertikal
-                        children: [
+                        children:
+                        [
                           Text(
-                            'Connect to sorter',
+                            'No sorter connected',
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           SizedBox(height: screenHeight * 0.005,),
                           Text(
-                            'Sorter not connected.',
+                            'Sorter not connected',
                             style: TextStyle(fontSize: 13),
                           ),
                         ],
@@ -107,6 +125,14 @@ class _HomePageState extends State<Homepage> {
 
                 SizedBox(height: screenHeight * 0.015),
 
+                box.isEmpty ?
+                SizedBox(
+                    width: screenWidth * 1,
+                    height: screenHeight * 0.55,
+                    child: Center(
+                        child: Text('No colors added', style: TextStyle(color: Colors.grey[400]),)
+                    )
+                ) :
                 GridView.builder(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
@@ -137,7 +163,6 @@ class _HomePageState extends State<Homepage> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             // Container atas: Row warna, expand otomatis
                             Expanded(
@@ -156,12 +181,59 @@ class _HomePageState extends State<Homepage> {
                                 }),
                               ),
                             ),
-
                             Container(
                               padding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                               height: screenHeight * 0.065,
                               color: Colors.grey[200],
-                              child: Text('#$name', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              child: Row(
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('#$name', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
+
+                                      Spacer(),
+
+                                      Row(
+                                        children: [
+                                          Text('Color: ', style: TextStyle(fontSize: 13),),
+                                          Row(
+                                            children: List.generate(redAvgs.length, (i) {
+                                              return FutureBuilder<String?>(
+                                                future: getColorName(redAvgs[i], greenAvgs[i], blueAvgs[i]),
+                                                builder: (context, snapshot) {
+                                                  String colorName = '...';
+                                                  if (snapshot.connectionState == ConnectionState.done) {
+                                                    if (snapshot.hasData) {
+                                                      colorName = snapshot.data!;
+                                                    } else {
+                                                      colorName = "Unknown";
+                                                    }
+                                                  }
+                                                  final isLast = i == redAvgs.length - 1;
+                                                  return Text(
+                                                    isLast ?
+                                                    colorName :
+                                                    '$colorName, ',
+                                                    style: const TextStyle(fontSize: 13),
+                                                  );
+                                                },
+                                              );
+                                            }),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  Spacer(),
+                                  IconButton(
+                                    onPressed: () async {
+                                      await box.deleteAt(index);
+                                      setState(() {});
+                                    },
+                                    icon: Icon(Icons.delete_forever_rounded,color: Colors.red,)
+                                  )
+                                ],
                               ),
                             ),
                           ],
