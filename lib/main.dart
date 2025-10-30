@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iotproject/Page/addPage.dart';
 import 'package:iotproject/Page/HomePage.dart';
+import 'Function/colorpalette.dart';
 import 'Function/data.dart';
 
 
@@ -12,11 +13,6 @@ void main() async {
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]
   );
-
-  await Hive.initFlutter();
-  
-  Hive.registerAdapter(ColorSetAdapter());
-  await Hive.openBox<ColorSet>('colorSets');
 
   runApp(const MyApp());
 }
@@ -28,7 +24,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        scaffoldBackgroundColor: Colors.white,
+        scaffoldBackgroundColor: AppColors.third,
       ),
       debugShowCheckedModeBanner: false,
       home: Homepage(),
