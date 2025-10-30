@@ -113,39 +113,58 @@ class _AddPageState extends State<AddPage> {
             SingleChildScrollView(
               child: Center(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    Text('Click* basket to check color', style: TextStyle(color: Colors.white, fontSize: 13),),
+
+                    SizedBox(height: screenHeight * 0.005,),
+
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
 
+                        Image.asset(
+                          'assets/Basket.png',
+                          width: screenWidth * 0.475,
+                        ),
+
+                        SizedBox(width: screenWidth * 0.01,),
+
+                        Image.asset(
+                          'assets/Basket.png',
+                          width: screenWidth * 0.475
+                        ),
                       ],
                     ),
 
-                    SizedBox(height: screenHeight * 0.005),
+                    SizedBox(height: screenHeight * 0.015),
 
                     ConstrainedBox(
                       constraints: BoxConstraints(
-                        minHeight: MediaQuery.of(context).size.height * 0.6, // misal maksimal 60% tinggi layar
+                        minHeight: MediaQuery.of(context).size.height * 0.55, // misal maksimal 60% tinggi layar
                       ),
                       child: Container(
                         decoration: BoxDecoration(
                           color: AppColors.third,
-                          borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(15), bottom: Radius.circular(0)),
                         ),
                         padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
 
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(height: screenHeight * 0.015),
 
-                            Row(
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text('Picked Colors', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
-                                Text(name.isNotEmpty ? "#$name" : "", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.grey),),
+                                SizedBox(height: screenHeight * 0.005,),
+                                Text('Drag the color to your basket!', style: TextStyle(fontSize: 13,),),
                               ],
                             ),
 
-                            SizedBox(height: screenHeight * 0.015),
+                            SizedBox(height: screenHeight * 0.03),
 
                             (redAvgs.isEmpty && greenAvgs.isEmpty && blueAvgs.isEmpty)
                                 ? SizedBox(
@@ -301,7 +320,60 @@ class _AddPageState extends State<AddPage> {
 
                     TextButton(
                       onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
 
+                            title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Save Color Set', style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),),
+                                SizedBox(height: screenHeight*0.01)
+                              ],
+                            ),
+
+                            content: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                  minWidth: screenWidth * 0.7,
+                                  maxWidth: screenWidth * 0.7
+                              ),
+
+                              child: TextField(
+                                controller: nameController,
+                                decoration: InputDecoration(
+                                  hintText: "e.g. Color1",
+                                  border: UnderlineInputBorder(),
+                                ),
+                              ),
+                            ),
+
+                            actions: [
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.black,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text('Save', style: TextStyle(fontSize: 13, color: Colors.white),)
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text('Cancel', style: TextStyle(fontSize: 13, color: Colors.red),)
+                              ),
+                            ],
+
+                          ),
+                        );
                       },
 
                       child: Text(

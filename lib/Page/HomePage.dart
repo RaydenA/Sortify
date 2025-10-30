@@ -118,13 +118,15 @@ class _HomePageState extends State<Homepage> {
                 ),
                 SizedBox(height: screenHeight * 0.03,),
 
-                Text('Your Colors', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
+                Text('Saved Colors', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
+                SizedBox(height: screenHeight * 0.005,),
+                Text('These are the colors you saved.', style: TextStyle(fontSize: 13,),),
 
-                SizedBox(height: screenHeight * 0.015),
+                SizedBox(height: screenHeight * 0.03),
 
                 SizedBox(
                     width: screenWidth * 1,
-                    height: screenHeight * 0.55,
+                    height: screenHeight * 0.5,
                     child: Center(
                         child: Text('No colors added', style: TextStyle(color: Colors.white),)
                     )
