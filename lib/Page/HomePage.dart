@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:iotproject/Function/colorpalette.dart';
 import 'package:iotproject/Function/data.dart';
+import 'package:iotproject/main.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -12,25 +13,108 @@ class Homepage extends StatefulWidget {
   State<Homepage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<Homepage> {
+class _HomePageState extends State<Homepage> with RouteAware {
   final AppData data = AppData();
+  String deviceName = "";
+  String status = "";
+  String? statusBefore;
+  Timer? pingTimer;
 
-  // buat manggil api nama warna
-  Future<String?> getColorName(int r, int g, int b) async {
+  @override
+  void initState() {
+    super.initState();
+    startPing();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Daftarkan halaman ini ke routeObserver
+    routeObserver.subscribe(this, ModalRoute.of(context)! as PageRoute);
+  }
+
+  void startPing() {
+    pingTimer?.cancel();
+    pingTimer = Timer.periodic(const Duration(seconds: 3), (_) => pingDevice());
+  }
+
+  void stopPing() {
+    pingTimer?.cancel();
+    pingTimer = null;
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    stopPing();
+    super.dispose();
+  }
+
+  // 📌 Dipanggil kalau halaman ini ditinggalkan (misal ke /addPage)
+  @override
+  void didPushNext() {
+    stopPing();
+  }
+
+  // 📌 Dipanggil kalau balik ke halaman ini lagi
+  @override
+  void didPopNext() {
+    startPing();
+  }
+
+  Future<void> pingDevice() async {
+    final url = Uri.parse('http://${data.esp32Ip}/ping');
+
     try {
-      final url = Uri.parse('https://www.thecolorapi.com/id?rgb=rgb($r,$g,$b)');
-      final response = await http.get(url);
+      final response = await http.get(url).timeout(const Duration(seconds: 3));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return data['name']['value'];
+        final newStatus = data['status'] ?? 'disconnected';
+        final newDevice = data['device'] ?? '';
+
+        // --- Hanya update UI kalau status berubah ---
+        if (statusBefore == null || statusBefore != newStatus) {
+          statusBefore = newStatus;
+          setState(() {
+            deviceName = newDevice;
+            status = newStatus;
+          });
+        }
       } else {
-        return null;
+        setDisconnected();
       }
     } catch (e) {
-      return null;
+      setDisconnected();
     }
   }
+
+  void setDisconnected() {
+    if (statusBefore != 'disconnected') {
+      statusBefore = 'disconnected';
+      setState(() {
+        deviceName = "";
+        status = "disconnected";
+      });
+    }
+  }
+
+  // buat manggil api nama warna
+  // Future<String?> getColorName(int r, int g, int b) async {
+  //   try {
+  //     final url = Uri.parse('https://www.thecolorapi.com/id?rgb=rgb($r,$g,$b)');
+  //     final response = await http.get(url);
+  //
+  //     if (response.statusCode == 200) {
+  //       final data = jsonDecode(response.body);
+  //       return data['name']['value'];
+  //     } else {
+  //       return null;
+  //     }
+  //   } catch (e) {
+  //     return null;
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +175,7 @@ class _HomePageState extends State<Homepage> {
                         children:
                         [
                           Text(
-                            'No sorter connected',
+                            statusBefore == "connected" ? deviceName : 'No sorter connected',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -99,7 +183,7 @@ class _HomePageState extends State<Homepage> {
                           ),
                           SizedBox(height: screenHeight * 0.005,),
                           Text(
-                            'Sorter not connected',
+                            statusBefore == "connected" ? 'Sorter is ready to use' :'Sorter not connected',
                             style: TextStyle(fontSize: 13),
                           ),
                         ],

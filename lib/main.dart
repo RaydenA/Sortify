@@ -7,6 +7,7 @@ import 'package:iotproject/Page/HomePage.dart';
 import 'Function/colorpalette.dart';
 import 'Function/data.dart';
 
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColors.third,
       ),
       debugShowCheckedModeBanner: false,
+      navigatorObservers: [routeObserver],
       home: Homepage(),
       routes: {
         '/homePage': (context) => Homepage(),

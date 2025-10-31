@@ -17,9 +17,9 @@ class _AddPageState extends State<AddPage> {
   TextEditingController nameController = TextEditingController();
   // Simpan nilai RGB rata-rata & nama
   String name = "";
-  List<int> redAvgs = [10, 255];
-  List<int> greenAvgs = [10, 30];
-  List<int> blueAvgs = [10, 50];
+  List<int> redAvgs = [];
+  List<int> greenAvgs = [];
+  List<int> blueAvgs = [];
 
   // Fungsi cek kemiripan warna
   bool isColorSimilar(Color newColor) {
@@ -169,7 +169,7 @@ class _AddPageState extends State<AddPage> {
                             (redAvgs.isEmpty && greenAvgs.isEmpty && blueAvgs.isEmpty)
                                 ? SizedBox(
                                 width: screenWidth * 1,
-                                height: screenHeight * 0.45,
+                                height: screenHeight * 0.35,
 
                                 child: Center(
                                     child: Text('No colors added', style: TextStyle(color: Colors.white),)
