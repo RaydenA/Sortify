@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:iotproject/Model/basket.dart';
 import 'package:iotproject/Page/addPage.dart';
 import 'package:iotproject/Page/HomePage.dart';
 import 'Function/colorpalette.dart';
@@ -11,9 +12,16 @@ final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]
-  );
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
+  await Hive.initFlutter();
+
+  Hive.registerAdapter(BasketAdapter());
+
+  await Hive.openBox<Basket>('basket');
 
   runApp(const MyApp());
 }
@@ -24,9 +32,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        scaffoldBackgroundColor: AppColors.third,
-      ),
+      theme: ThemeData(scaffoldBackgroundColor: AppColors.third),
       debugShowCheckedModeBanner: false,
       navigatorObservers: [routeObserver],
       home: Homepage(),

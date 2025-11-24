@@ -4,7 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:iotproject/Function/colorpalette.dart';
 import 'package:iotproject/Function/data.dart';
+import 'package:iotproject/Model/basket.dart';
 import 'package:iotproject/main.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import '../Model/basket.dart';
+import '../boxes.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -118,7 +123,6 @@ class _HomePageState extends State<Homepage> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
-
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -128,15 +132,22 @@ class _HomePageState extends State<Homepage> with RouteAware {
         backgroundColor: AppColors.third,
         shadowColor: Colors.black.withOpacity(0.2),
         titleSpacing: 24,
-        title: Text("Hello, welcome to Sortify", style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),),
+        title: Text(
+          "Hello, welcome to Sortify",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 24),
             child: IconButton(
-              onPressed: (){},
-              icon: Icon(Icons.info_rounded, color: Colors.black,)
+              onPressed: () {},
+              icon: Icon(Icons.info_rounded, color: Colors.black),
             ),
-          )
+          ),
         ],
       ),
 
@@ -147,7 +158,7 @@ class _HomePageState extends State<Homepage> with RouteAware {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: screenHeight * 0.005,),
+                SizedBox(height: screenHeight * 0.005),
                 Container(
                   height: screenHeight * 0.1,
                   padding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
@@ -157,33 +168,37 @@ class _HomePageState extends State<Homepage> with RouteAware {
                         color: Colors.black.withOpacity(0.2),
                         blurRadius: 10,
                         offset: const Offset(4, 4),
-                      )
+                      ),
                     ],
                     color: AppColors.fourth,
-                    borderRadius: BorderRadius.circular(10)
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
                     children: [
-                      Image.asset('assets/shirt.png', scale: 25,),
+                      Image.asset('assets/shirt.png', scale: 25),
 
-                      SizedBox(width: screenWidth * 0.03,),
-
+                      SizedBox(width: screenWidth * 0.03),
 
                       Column(
-                        crossAxisAlignment: CrossAxisAlignment.start, // ⬅️ ini penting!
-                        mainAxisAlignment: MainAxisAlignment.center,   // optional biar teks sejajar secara vertikal
-                        children:
-                        [
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start, // ⬅️ ini penting!
+                        mainAxisAlignment: MainAxisAlignment
+                            .center, // optional biar teks sejajar secara vertikal
+                        children: [
                           Text(
-                            statusBefore == "connected" ? deviceName : 'No sorter connected',
+                            statusBefore == "connected"
+                                ? deviceName
+                                : 'No sorter connected',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: screenHeight * 0.005,),
+                          SizedBox(height: screenHeight * 0.005),
                           Text(
-                            statusBefore == "connected" ? 'Sorter is ready to use' :'Sorter not connected',
+                            statusBefore == "connected"
+                                ? 'Sorter is ready to use'
+                                : 'Sorter not connected',
                             style: TextStyle(fontSize: 13),
                           ),
                         ],
@@ -192,28 +207,84 @@ class _HomePageState extends State<Homepage> with RouteAware {
                       Spacer(),
 
                       IconButton(
-                          onPressed: (){
-
-                          },
-                          icon: Icon(Icons.arrow_forward_ios_rounded)
+                        onPressed: () {},
+                        icon: Icon(Icons.arrow_forward_ios_rounded),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: screenHeight * 0.03,),
+                SizedBox(height: screenHeight * 0.03),
 
-                Text('Saved Colors', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
-                SizedBox(height: screenHeight * 0.005,),
-                Text('These are the colors you saved.', style: TextStyle(fontSize: 13,),),
+                Text(
+                  'Saved Colors',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: screenHeight * 0.005),
+                Text(
+                  'These are the colors you saved.',
+                  style: TextStyle(fontSize: 13),
+                ),
 
                 SizedBox(height: screenHeight * 0.03),
 
                 SizedBox(
-                    width: screenWidth * 1,
-                    height: screenHeight * 0.5,
-                    child: Center(
-                        child: Text('No colors added', style: TextStyle(color: Colors.white),)
-                    )
+                  width: screenWidth * 1,
+                  height: screenHeight * 0.5,
+                  child: Center(
+                    child: ValueListenableBuilder<Box<Basket>>(
+                      valueListenable: Boxes.getBasket().listenable(),
+                      builder: (context, box, _) {
+                        final baskets = box.values.toList().cast<Basket>();
+
+                        if (baskets.isEmpty) {
+                          return Center(
+                            child: Text(
+                              'No colors added',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          );
+                        }
+
+                        return ListView.builder(
+                          itemCount: baskets.length,
+                          itemBuilder: (context, index) {
+                            final basket = baskets[index];
+
+                            return Card(
+                              margin: const EdgeInsets.symmetric(
+                                vertical: 8,
+                                horizontal: 12,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      basket.name,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+
+                                    Text("Red A : ${basket.redAvgsA}"),
+                                    Text("Green A : ${basket.greenAvgsA}"),
+                                    Text("Blue A : ${basket.blueAvgsA}"),
+                                    const SizedBox(height: 4),
+                                    Text("Red B : ${basket.redAvgsB}"),
+                                    Text("Green B : ${basket.greenAvgsB}"),
+                                    Text("Blue B : ${basket.blueAvgsB}"),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
                 ),
 
                 // Row(
@@ -246,10 +317,9 @@ class _HomePageState extends State<Homepage> with RouteAware {
                 //   ],
                 // ),
                 SizedBox(height: screenHeight * 0.1),
-
               ],
             ),
-          )
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -258,22 +328,15 @@ class _HomePageState extends State<Homepage> with RouteAware {
           final result = await Navigator.pushNamed(context, '/addPage');
 
           if (result == true) {
-            setState(() {
-
-            });
+            setState(() {});
           }
         },
         tooltip: 'Add',
         backgroundColor: Colors.white,
         elevation: 4,
         shape: const CircleBorder(),
-        child: const Icon(
-          Icons.add,
-          color: Colors.black,
-          size: 40,
-        ),
+        child: const Icon(Icons.add, color: Colors.black, size: 40),
       ),
-
     );
   }
 }

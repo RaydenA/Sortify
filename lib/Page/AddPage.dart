@@ -4,6 +4,10 @@ import 'package:iotproject/Page/DetectPage.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:iotproject/Function/data.dart';
 import '../Function/colorpalette.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import '../Model/basket.dart';
+import '../boxes.dart';
 
 class AddPage extends StatefulWidget {
   const AddPage({super.key});
@@ -16,10 +20,12 @@ class _AddPageState extends State<AddPage> {
   final AppData data = AppData();
   TextEditingController nameController = TextEditingController();
   // Simpan nilai RGB rata-rata & nama
-  String name = "";
-  List<int> redAvgs = [];
-  List<int> greenAvgs = [];
-  List<int> blueAvgs = [];
+  late String name = nameController.text;
+  List<int> redAvgs = [255, 0];
+  List<int> greenAvgs = [255, 0];
+  List<int> blueAvgs = [255, 0];
+
+  final basket = Basket();
 
   // Fungsi cek kemiripan warna
   bool isColorSimilar(Color newColor) {
@@ -36,6 +42,13 @@ class _AddPageState extends State<AddPage> {
   }
 
   @override
+  void dispose() {
+    Hive.close();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
@@ -46,8 +59,7 @@ class _AddPageState extends State<AddPage> {
         toolbarHeight: 60,
         backgroundColor: AppColors.fourth,
         leadingWidth: 72,
-        leading:
-        IconButton(
+        leading: IconButton(
           color: Colors.black,
           onPressed: () {
             Navigator.pop(context, true);
@@ -59,13 +71,10 @@ class _AddPageState extends State<AddPage> {
             padding: const EdgeInsets.only(right: 24),
             child: TextButton(
               onPressed: () async {
-
                 // Buka halaman deteksi dan tunggu hasilnya
                 Color? detectedColor = await Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => DetectPage(),
-                  ),
+                  MaterialPageRoute(builder: (_) => DetectPage()),
                 );
 
                 // Kalau dapat warna, validasi kemiripan
@@ -81,7 +90,10 @@ class _AddPageState extends State<AddPage> {
                         backgroundColor: Colors.redAccent,
                         duration: Duration(seconds: 2),
                         behavior: SnackBarBehavior.floating,
-                        margin: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
+                        margin: EdgeInsets.symmetric(
+                          horizontal: 50,
+                          vertical: 10,
+                        ),
                       ),
                     );
                     return; // jangan tambah warna
@@ -97,15 +109,11 @@ class _AddPageState extends State<AddPage> {
               },
               child: const Text(
                 'Add',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16
-                ),
+                style: TextStyle(color: Colors.black, fontSize: 16),
               ),
             ),
           ),
         ],
-
       ),
       body: SafeArea(
         child: Stack(
@@ -115,24 +123,84 @@ class _AddPageState extends State<AddPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text('Click* basket to check color', style: TextStyle(color: Colors.white, fontSize: 13),),
+                    Text(
+                      'Click* basket to check color',
+                      style: TextStyle(color: Colors.white, fontSize: 13),
+                    ),
 
-                    SizedBox(height: screenHeight * 0.005,),
+                    SizedBox(height: screenHeight * 0.005),
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-
-                        Image.asset(
-                          'assets/Basket.png',
-                          width: screenWidth * 0.475,
+                        DragTarget(
+                          builder: (context, candidateData, rejectedData) {
+                            return Image.asset(
+                              'assets/Basket.png',
+                              width: screenWidth * 0.475,
+                            );
+                          },
+                          onWillAccept: (data) => true,
+                          onAccept: (data) {
+                            final item = data as Map<String, dynamic>;
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                title: Text('accepted data : '),
+                                content: Text(
+                                  'R: ${item['r']}, G: ${item['g']}, B: ${item['b']}',
+                                ),
+                              ),
+                            );
+                            basket.redAvgsA.add(item['r']);
+                            basket.greenAvgsA.add(item['g']);
+                            basket.blueAvgsA.add(item['b']);
+                            setState(() {
+                              redAvgs.removeAt(item['index']);
+                              greenAvgs.removeAt(item['index']);
+                              blueAvgs.removeAt(item['index']);
+                            });
+                          },
                         ),
 
-                        SizedBox(width: screenWidth * 0.01,),
+                        SizedBox(width: screenWidth * 0.01),
 
-                        Image.asset(
-                          'assets/Basket.png',
-                          width: screenWidth * 0.475
+                        DragTarget(
+                          builder: (context, candidateData, rejectedData) {
+                            return Image.asset(
+                              'assets/Basket.png',
+                              width: screenWidth * 0.475,
+                            );
+                          },
+                          onWillAccept: (data) => true,
+                          onAccept: (data) {
+                            final item = data as Map<String, dynamic>;
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                title: Text('accepted data : '),
+                                content: Text(
+                                  'R: ${item['r']}, G: ${item['g']}, B: ${item['b']}',
+                                ),
+                              ),
+                            );
+                            basket.redAvgsB.add(item['r']);
+                            basket.greenAvgsB.add(item['g']);
+                            basket.blueAvgsB.add(item['b']);
+                            setState(() {
+                              redAvgs.removeAt(item['index']);
+                              greenAvgs.removeAt(item['index']);
+                              blueAvgs.removeAt(item['index']);
+                            });
+                          },
                         ),
                       ],
                     ),
@@ -141,14 +209,22 @@ class _AddPageState extends State<AddPage> {
 
                     ConstrainedBox(
                       constraints: BoxConstraints(
-                        minHeight: MediaQuery.of(context).size.height * 0.55, // misal maksimal 60% tinggi layar
+                        minHeight:
+                            MediaQuery.of(context).size.height *
+                            0.55, // misal maksimal 60% tinggi layar
                       ),
                       child: Container(
                         decoration: BoxDecoration(
                           color: AppColors.third,
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(15), bottom: Radius.circular(0)),
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(15),
+                            bottom: Radius.circular(0),
+                          ),
                         ),
-                        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 24,
+                        ),
 
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,120 +234,201 @@ class _AddPageState extends State<AddPage> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Picked Colors', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
-                                SizedBox(height: screenHeight * 0.005,),
-                                Text('Drag the color to your basket!', style: TextStyle(fontSize: 13,),),
+                                Text(
+                                  'Picked Colors',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: screenHeight * 0.005),
+                                Text(
+                                  'Drag the color to your basket!',
+                                  style: TextStyle(fontSize: 13),
+                                ),
                               ],
                             ),
 
                             SizedBox(height: screenHeight * 0.03),
 
-                            (redAvgs.isEmpty && greenAvgs.isEmpty && blueAvgs.isEmpty)
+                            (redAvgs.isEmpty &&
+                                    greenAvgs.isEmpty &&
+                                    blueAvgs.isEmpty)
                                 ? SizedBox(
-                                width: screenWidth * 1,
-                                height: screenHeight * 0.35,
+                                    width: screenWidth * 1,
+                                    height: screenHeight * 0.35,
 
-                                child: Center(
-                                    child: Text('No colors added', style: TextStyle(color: Colors.white),)
-                                )
-                            )
+                                    child: Center(
+                                      child: Text(
+                                        'No colors added',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                  )
                                 : GridView.builder(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                mainAxisSpacing: 15,
-                                crossAxisSpacing: 15,
-                                childAspectRatio: 0.75,
-                              ),
-                              itemCount: redAvgs.length,
-                              itemBuilder: (context, index) {
-                                final r = redAvgs[index];
-                                final g = greenAvgs[index];
-                                final b = blueAvgs[index];
-                                final color = Color.fromARGB(255, r, g, b);
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 2,
+                                          mainAxisSpacing: 15,
+                                          crossAxisSpacing: 15,
+                                          childAspectRatio: 0.75,
+                                        ),
+                                    itemCount: redAvgs.length,
+                                    itemBuilder: (context, index) {
+                                      final r = redAvgs[index];
+                                      final g = greenAvgs[index];
+                                      final b = blueAvgs[index];
+                                      final color = Color.fromARGB(
+                                        255,
+                                        r,
+                                        g,
+                                        b,
+                                      );
 
-                                return Container(
-                                  decoration: BoxDecoration(
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
-                                        blurRadius: 10,
-                                        offset: const Offset(4, 4),
-                                      )
-                                    ],
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  clipBehavior: Clip.hardEdge,
-                                  child: Column(
-                                    children: [
-                                      AspectRatio(
-                                        aspectRatio: 1,
-                                        child: Container(
-                                            width: double.infinity,
-                                            color: Colors.white,
-                                            child: Stack(
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsets.all(18.0),
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                      color: color.withOpacity(0.7),
-                                                      borderRadius: BorderRadius.circular(80),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Align(
-                                                  alignment: Alignment.center,
-                                                  child: Image.asset(
-                                                    'assets/shirt.png',
-                                                    scale: 13,
-                                                  ),
-                                                ),
-                                                Align(
-                                                  alignment: Alignment.topRight,
-                                                  child: IconButton(
-                                                      onPressed: (){
-                                                        setState(() {
-                                                          redAvgs.removeAt(index);
-                                                          greenAvgs.removeAt(index);
-                                                          blueAvgs.removeAt(index);
-                                                        });
-                                                      },
-                                                      icon: Icon(Icons.cancel_rounded, color: AppColors.second,)
-                                                  ),
+                                      return Draggable(
+                                        data: {
+                                          'r': r,
+                                          'g': g,
+                                          'b': b,
+                                          'index': index,
+                                        },
+                                        feedback: Material(
+                                          color: Colors.transparent,
+                                          child: Container(
+                                            width: 80,
+                                            height: 80,
+                                            decoration: BoxDecoration(
+                                              color: color.withOpacity(0.7),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(0.2),
+                                                  blurRadius: 6,
                                                 ),
                                               ],
-                                            )
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Container(
-                                          color: AppColors.first,
-                                          child: Center(
-                                            child: Text(
-                                              'R:$r  G:$g  B:$b',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 13,
+                                            ),
+                                            child: Center(
+                                              child: Image.asset(
+                                                'assets/shirt.png',
+                                                scale: 15,
                                               ),
-                                              textAlign: TextAlign.center,
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(
+                                                  0.2,
+                                                ),
+                                                blurRadius: 10,
+                                                offset: const Offset(4, 4),
+                                              ),
+                                            ],
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          clipBehavior: Clip.hardEdge,
+                                          child: Column(
+                                            children: [
+                                              AspectRatio(
+                                                aspectRatio: 1,
+                                                child: Container(
+                                                  width: double.infinity,
+                                                  color: Colors.white,
+                                                  child: Stack(
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets.all(
+                                                              18.0,
+                                                            ),
+                                                        child: Container(
+                                                          decoration: BoxDecoration(
+                                                            color: color
+                                                                .withOpacity(
+                                                                  0.7,
+                                                                ),
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  80,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Align(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        child: Image.asset(
+                                                          'assets/shirt.png',
+                                                          scale: 13,
+                                                        ),
+                                                      ),
+                                                      Align(
+                                                        alignment:
+                                                            Alignment.topRight,
+                                                        child: IconButton(
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              redAvgs.removeAt(
+                                                                index,
+                                                              );
+                                                              greenAvgs
+                                                                  .removeAt(
+                                                                    index,
+                                                                  );
+                                                              blueAvgs.removeAt(
+                                                                index,
+                                                              );
+                                                            });
+                                                          },
+                                                          icon: Icon(
+                                                            Icons
+                                                                .cancel_rounded,
+                                                            color: AppColors
+                                                                .second,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Container(
+                                                  color: AppColors.first,
+                                                  child: Center(
+                                                    child: Text(
+                                                      'R:$r  G:$g  B:$b',
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 13,
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
-                                );
-                              },
-                            ),
                             SizedBox(height: screenHeight * 0.1),
                           ],
                         ),
                       ),
                     ),
-
                   ],
                 ),
               ),
@@ -287,10 +444,12 @@ class _AddPageState extends State<AddPage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(width: 24,),
+                    SizedBox(width: 24),
                     TextButton(
                       onPressed: () async {
-                        if (redAvgs.isEmpty && greenAvgs.isEmpty && blueAvgs.isEmpty) {
+                        if (redAvgs.isEmpty &&
+                            greenAvgs.isEmpty &&
+                            blueAvgs.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(
@@ -301,7 +460,10 @@ class _AddPageState extends State<AddPage> {
                               backgroundColor: Colors.redAccent,
                               duration: Duration(seconds: 2),
                               behavior: SnackBarBehavior.floating,
-                              margin: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
+                              margin: EdgeInsets.symmetric(
+                                horizontal: 50,
+                                vertical: 10,
+                              ),
                             ),
                           );
                         } else {
@@ -314,8 +476,12 @@ class _AddPageState extends State<AddPage> {
                       },
                       child: Text(
                         'Clear',
-                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
-                      )
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
                     ),
 
                     TextButton(
@@ -331,15 +497,22 @@ class _AddPageState extends State<AddPage> {
                             title: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Save Color Set', style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),),
-                                SizedBox(height: screenHeight*0.01)
+                                Text(
+                                  'Save Color Set',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: screenHeight * 0.01),
                               ],
                             ),
 
                             content: ConstrainedBox(
                               constraints: BoxConstraints(
-                                  minWidth: screenWidth * 0.7,
-                                  maxWidth: screenWidth * 0.7
+                                minWidth: screenWidth * 0.7,
+                                maxWidth: screenWidth * 0.7,
                               ),
 
                               child: TextField(
@@ -360,26 +533,44 @@ class _AddPageState extends State<AddPage> {
                                   ),
                                 ),
                                 onPressed: () {
+                                  final box = Boxes.getBasket();
+                                  basket.name = name;
+                                  box.add(basket);
                                   Navigator.pop(context);
                                 },
-                                child: Text('Save', style: TextStyle(fontSize: 13, color: Colors.white),)
+                                child: Text(
+                                  'Save',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
-                                child: Text('Cancel', style: TextStyle(fontSize: 13, color: Colors.red),)
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.red,
+                                  ),
+                                ),
                               ),
                             ],
-
                           ),
                         );
                       },
 
                       child: Text(
                         'Save',
-                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
-                      )
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
                     ),
 
                     Spacer(),
@@ -402,7 +593,10 @@ class _AddPageState extends State<AddPage> {
                               backgroundColor: Colors.redAccent,
                               duration: Duration(seconds: 2),
                               behavior: SnackBarBehavior.floating,
-                              margin: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
+                              margin: EdgeInsets.symmetric(
+                                horizontal: 50,
+                                vertical: 10,
+                              ),
                             ),
                           );
                           return;
@@ -424,16 +618,20 @@ class _AddPageState extends State<AddPage> {
                       },
                       child: Text(
                         "Sort",
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                         textAlign: TextAlign.center,
-                      )
+                      ),
                     ),
-                    SizedBox(width: 24,),
+                    SizedBox(width: 24),
                   ],
                 ),
               ),
             ),
-          ]
+          ],
         ),
       ),
     );
