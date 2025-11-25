@@ -21,11 +21,11 @@ class _AddPageState extends State<AddPage> {
   TextEditingController nameController = TextEditingController();
   // Simpan nilai RGB rata-rata & nama
   late String name = nameController.text;
-  List<int> redAvgs = [255, 0];
-  List<int> greenAvgs = [255, 0];
-  List<int> blueAvgs = [255, 0];
+  List<int> redAvgs = [];
+  List<int> greenAvgs = [];
+  List<int> blueAvgs = [];
 
-  final basket = Basket();
+  late var basket = Basket();
 
   // Fungsi cek kemiripan warna
   bool isColorSimilar(Color newColor) {
@@ -42,16 +42,15 @@ class _AddPageState extends State<AddPage> {
   }
 
   @override
-  void dispose() {
-    Hive.close();
-
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final basketPreset = ModalRoute.of(context)!.settings.arguments as Basket?;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+
+    if (basketPreset != null) {
+      basket = basketPreset;
+      nameController.text = basket.name;
+    }
 
     return Scaffold(
       backgroundColor: AppColors.fourth,
@@ -135,30 +134,111 @@ class _AddPageState extends State<AddPage> {
                       children: [
                         DragTarget(
                           builder: (context, candidateData, rejectedData) {
-                            return Image.asset(
-                              'assets/Basket.png',
-                              width: screenWidth * 0.475,
+                            return InkWell(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    title: Text('Basket A: '),
+                                    content: Wrap(
+                                      spacing: 10,
+                                      runSpacing: 10,
+                                      children: List.generate(
+                                        basket.redAvgsA.length,
+                                        (i) {
+                                          return Card(
+                                            margin: const EdgeInsets.symmetric(
+                                              vertical: 8,
+                                              horizontal: 12,
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(12),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Container(
+                                                    width: 30,
+                                                    height: 30,
+                                                    decoration: BoxDecoration(
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.black
+                                                              .withOpacity(0.3),
+                                                          blurRadius: 6,
+                                                          offset: const Offset(
+                                                            2,
+                                                            2,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                      color: Color.fromARGB(
+                                                        255,
+                                                        basket.redAvgsA[i],
+                                                        basket.blueAvgsA[i],
+                                                        basket.greenAvgsA[i],
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            6,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                  IconButton(
+                                                    onPressed: () {
+                                                      redAvgs.add(
+                                                        basket.redAvgsA[i],
+                                                      );
+                                                      greenAvgs.add(
+                                                        basket.greenAvgsA[i],
+                                                      );
+                                                      blueAvgs.add(
+                                                        basket.blueAvgsA[i],
+                                                      );
+                                                      basket.redAvgsA.removeAt(
+                                                        i,
+                                                      );
+                                                      basket.greenAvgsA
+                                                          .removeAt(i);
+                                                      basket.blueAvgsA.removeAt(
+                                                        i,
+                                                      );
+                                                    },
+                                                    icon: Icon(
+                                                      Icons.delete,
+                                                      color: Colors.red,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Image.asset(
+                                'assets/Basket.png',
+                                width: screenWidth * 0.475,
+                              ),
                             );
                           },
                           onWillAccept: (data) => true,
                           onAccept: (data) {
                             final item = data as Map<String, dynamic>;
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                backgroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                title: Text('accepted data : '),
-                                content: Text(
-                                  'R: ${item['r']}, G: ${item['g']}, B: ${item['b']}',
-                                ),
-                              ),
-                            );
                             basket.redAvgsA.add(item['r']);
                             basket.greenAvgsA.add(item['g']);
                             basket.blueAvgsA.add(item['b']);
+
+                            // basket.save();
+
                             setState(() {
                               redAvgs.removeAt(item['index']);
                               greenAvgs.removeAt(item['index']);
@@ -171,30 +251,111 @@ class _AddPageState extends State<AddPage> {
 
                         DragTarget(
                           builder: (context, candidateData, rejectedData) {
-                            return Image.asset(
-                              'assets/Basket.png',
-                              width: screenWidth * 0.475,
+                            return InkWell(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    title: Text('Basket B: '),
+                                    content: Wrap(
+                                      spacing: 10,
+                                      runSpacing: 10,
+                                      children: List.generate(
+                                        basket.redAvgsB.length,
+                                        (i) {
+                                          return Card(
+                                            margin: const EdgeInsets.symmetric(
+                                              vertical: 8,
+                                              horizontal: 12,
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(12),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Container(
+                                                    width: 30,
+                                                    height: 30,
+                                                    decoration: BoxDecoration(
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.black
+                                                              .withOpacity(0.3),
+                                                          blurRadius: 6,
+                                                          offset: const Offset(
+                                                            2,
+                                                            2,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                      color: Color.fromARGB(
+                                                        255,
+                                                        basket.redAvgsB[i],
+                                                        basket.blueAvgsB[i],
+                                                        basket.greenAvgsB[i],
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            6,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                  IconButton(
+                                                    onPressed: () {
+                                                      redAvgs.add(
+                                                        basket.redAvgsB[i],
+                                                      );
+                                                      greenAvgs.add(
+                                                        basket.greenAvgsB[i],
+                                                      );
+                                                      blueAvgs.add(
+                                                        basket.blueAvgsB[i],
+                                                      );
+                                                      basket.redAvgsB.removeAt(
+                                                        i,
+                                                      );
+                                                      basket.greenAvgsB
+                                                          .removeAt(i);
+                                                      basket.blueAvgsB.removeAt(
+                                                        i,
+                                                      );
+                                                    },
+                                                    icon: Icon(
+                                                      Icons.delete,
+                                                      color: Colors.red,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Image.asset(
+                                'assets/Basket.png',
+                                width: screenWidth * 0.475,
+                              ),
                             );
                           },
                           onWillAccept: (data) => true,
                           onAccept: (data) {
                             final item = data as Map<String, dynamic>;
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                backgroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                title: Text('accepted data : '),
-                                content: Text(
-                                  'R: ${item['r']}, G: ${item['g']}, B: ${item['b']}',
-                                ),
-                              ),
-                            );
                             basket.redAvgsB.add(item['r']);
                             basket.greenAvgsB.add(item['g']);
                             basket.blueAvgsB.add(item['b']);
+
+                            // basket.save();
+
                             setState(() {
                               redAvgs.removeAt(item['index']);
                               greenAvgs.removeAt(item['index']);
@@ -534,8 +695,12 @@ class _AddPageState extends State<AddPage> {
                                 ),
                                 onPressed: () {
                                   final box = Boxes.getBasket();
-                                  basket.name = name;
-                                  box.add(basket);
+                                  if (basketPreset != null) {
+                                    basketPreset.name = nameController.text;
+                                  } else {
+                                    basket.name = name;
+                                    box.add(basket);
+                                  }
                                   Navigator.pop(context);
                                 },
                                 child: Text(

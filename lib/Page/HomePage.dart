@@ -52,6 +52,7 @@ class _HomePageState extends State<Homepage> with RouteAware {
   void dispose() {
     routeObserver.unsubscribe(this);
     stopPing();
+    Hive.close();
     super.dispose();
   }
 
@@ -250,33 +251,145 @@ class _HomePageState extends State<Homepage> with RouteAware {
                           itemBuilder: (context, index) {
                             final basket = baskets[index];
 
-                            return Card(
-                              margin: const EdgeInsets.symmetric(
-                                vertical: 8,
-                                horizontal: 12,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      basket.name,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6),
+                            return InkWell(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/addPage',
+                                  arguments: basket,
+                                );
+                              },
+                              child: Card(
+                                margin: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                  horizontal: 12,
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
 
-                                    Text("Red A : ${basket.redAvgsA}"),
-                                    Text("Green A : ${basket.greenAvgsA}"),
-                                    Text("Blue A : ${basket.blueAvgsA}"),
-                                    const SizedBox(height: 4),
-                                    Text("Red B : ${basket.redAvgsB}"),
-                                    Text("Green B : ${basket.greenAvgsB}"),
-                                    Text("Blue B : ${basket.blueAvgsB}"),
-                                  ],
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            basket.name,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                          IconButton(
+                                            onPressed: () {
+                                              box.deleteAt(index);
+                                            },
+                                            icon: Icon(
+                                              Icons.delete,
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+                                      const SizedBox(height: 12),
+                                      Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text("Basket A: "),
+                                              Wrap(
+                                                spacing: 10,
+                                                runSpacing: 10,
+                                                children: List.generate(
+                                                  basket.redAvgsA.length,
+                                                  (i) {
+                                                    return Container(
+                                                      width: 30,
+                                                      height: 30,
+                                                      decoration: BoxDecoration(
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors.black
+                                                                .withOpacity(
+                                                                  0.3,
+                                                                ),
+                                                            blurRadius: 6,
+                                                            offset:
+                                                                const Offset(
+                                                                  2,
+                                                                  2,
+                                                                ),
+                                                          ),
+                                                        ],
+                                                        color: Color.fromARGB(
+                                                          255,
+                                                          basket.redAvgsA[i],
+                                                          basket.blueAvgsA[i],
+                                                          basket.greenAvgsA[i],
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              6,
+                                                            ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 10),
+                                          Row(
+                                            children: [
+                                              Text("Basket B: "),
+                                              Wrap(
+                                                spacing: 10,
+                                                runSpacing: 10,
+                                                children: List.generate(
+                                                  basket.redAvgsB.length,
+                                                  (i) {
+                                                    return Container(
+                                                      width: 30,
+                                                      height: 30,
+                                                      decoration: BoxDecoration(
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors.black
+                                                                .withOpacity(
+                                                                  0.3,
+                                                                ),
+                                                            blurRadius: 6,
+                                                            offset:
+                                                                const Offset(
+                                                                  2,
+                                                                  2,
+                                                                ),
+                                                          ),
+                                                        ],
+                                                        color: Color.fromARGB(
+                                                          255,
+                                                          basket.redAvgsB[i],
+                                                          basket.blueAvgsB[i],
+                                                          basket.greenAvgsB[i],
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              6,
+                                                            ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             );
