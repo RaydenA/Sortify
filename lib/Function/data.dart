@@ -3,11 +3,6 @@ class AppData {
   factory AppData() => _instance;
   AppData._internal();
 
-  // IP ESP32 (hardcoded)
-  String esp32Ip = '192.168.31.114';
+  // Default kosong → supaya hanya terisi ketika user memilih ESP32
+  String esp32Ip = '';
 }
-
-
-
-
-

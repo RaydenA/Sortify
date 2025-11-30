@@ -139,90 +139,98 @@ class _AddPageState extends State<AddPage> {
                                 showDialog(
                                   context: context,
                                   builder: (context) => AlertDialog(
+                                    insetPadding: EdgeInsets.all(20), // Controls max width
                                     backgroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
-                                    title: Text('Basket A: '),
-                                    content: Wrap(
-                                      spacing: 10,
-                                      runSpacing: 10,
-                                      children: List.generate(
-                                        basket.redAvgsA.length,
-                                        (i) {
-                                          return Card(
-                                            margin: const EdgeInsets.symmetric(
-                                              vertical: 8,
-                                              horizontal: 12,
+                                    title: Stack(
+                                      children: [
+                                        // Title text
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            'Basket A',
+                                            style: TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.bold,
                                             ),
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(12),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Container(
-                                                    width: 30,
-                                                    height: 30,
-                                                    decoration: BoxDecoration(
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: Colors.black
-                                                              .withOpacity(0.3),
-                                                          blurRadius: 6,
-                                                          offset: const Offset(
-                                                            2,
-                                                            2,
-                                                          ),
+                                          ),
+                                        ),
+
+                                        // Close icon
+                                        Positioned(
+                                          right: 0,
+                                          top: 0,
+                                          child: InkWell(
+                                            onTap: () => Navigator.pop(context),
+                                            child: Icon(
+                                              Icons.cancel_rounded,
+                                              color: AppColors.second,
+                                              size: 28,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    content: SizedBox(
+                                      width: screenWidth * 0.85,   // <--- Control dialog width here
+                                      height: screenHeight * 0.55,  // <--- Control dialog height here
+                                      child: SingleChildScrollView(
+                                        child: Wrap(
+                                          spacing: 10,
+                                          runSpacing: 10,
+                                          children: List.generate(basket.redAvgsA.length, (i) {
+                                            return Card(
+                                              color: AppColors.first,
+                                              margin: const EdgeInsets.symmetric(vertical: 5),
+                                              child: Padding(
+                                                padding: const EdgeInsets.fromLTRB(13,5,5,5),
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Container(
+                                                      width: 35,
+                                                      height: 35,
+                                                      decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                          color: Colors.black,  // border color
+                                                          width: 1,             // border width
                                                         ),
-                                                      ],
-                                                      color: Color.fromARGB(
-                                                        255,
-                                                        basket.redAvgsA[i],
-                                                        basket.blueAvgsA[i],
-                                                        basket.greenAvgsA[i],
+                                                        color: Color.fromARGB(
+                                                          255,
+                                                          basket.redAvgsA[i],
+                                                          basket.greenAvgsA[i],
+                                                          basket.blueAvgsA[i],
+                                                        ),
                                                       ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            6,
-                                                          ),
                                                     ),
-                                                  ),
-                                                  IconButton(
-                                                    onPressed: () {
-                                                      redAvgs.add(
-                                                        basket.redAvgsA[i],
-                                                      );
-                                                      greenAvgs.add(
-                                                        basket.greenAvgsA[i],
-                                                      );
-                                                      blueAvgs.add(
-                                                        basket.blueAvgsA[i],
-                                                      );
-                                                      basket.redAvgsA.removeAt(
-                                                        i,
-                                                      );
-                                                      basket.greenAvgsA
-                                                          .removeAt(i);
-                                                      basket.blueAvgsA.removeAt(
-                                                        i,
-                                                      );
-                                                    },
-                                                    icon: Icon(
-                                                      Icons.delete,
-                                                      color: Colors.red,
+                                                    IconButton(
+                                                      onPressed: () {
+                                                        redAvgs.add(basket.redAvgsA[i]);
+                                                        greenAvgs.add(basket.greenAvgsA[i]);
+                                                        blueAvgs.add(basket.blueAvgsA[i]);
+
+                                                        basket.redAvgsA.removeAt(i);
+                                                        basket.greenAvgsA.removeAt(i);
+                                                        basket.blueAvgsA.removeAt(i);
+
+
+                                                        Navigator.pop(context);
+                                                      },
+                                                      icon: Icon(Icons.double_arrow_rounded, color: Colors.white),
                                                     ),
-                                                  ),
-                                                ],
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          );
-                                        },
+                                            );
+                                          }),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 );
+
                               },
                               child: Image.asset(
                                 'assets/Basket.png',
@@ -256,90 +264,98 @@ class _AddPageState extends State<AddPage> {
                                 showDialog(
                                   context: context,
                                   builder: (context) => AlertDialog(
+                                    insetPadding: EdgeInsets.all(20), // Controls max width
                                     backgroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
-                                    title: Text('Basket B: '),
-                                    content: Wrap(
-                                      spacing: 10,
-                                      runSpacing: 10,
-                                      children: List.generate(
-                                        basket.redAvgsB.length,
-                                        (i) {
-                                          return Card(
-                                            margin: const EdgeInsets.symmetric(
-                                              vertical: 8,
-                                              horizontal: 12,
+                                    title: Stack(
+                                      children: [
+                                        // Title text
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            'Basket B',
+                                            style: TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.bold,
                                             ),
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(12),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Container(
-                                                    width: 30,
-                                                    height: 30,
-                                                    decoration: BoxDecoration(
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: Colors.black
-                                                              .withOpacity(0.3),
-                                                          blurRadius: 6,
-                                                          offset: const Offset(
-                                                            2,
-                                                            2,
-                                                          ),
+                                          ),
+                                        ),
+
+                                        // Close icon
+                                        Positioned(
+                                          right: 0,
+                                          top: 0,
+                                          child: InkWell(
+                                            onTap: () => Navigator.pop(context),
+                                            child: Icon(
+                                              Icons.cancel_rounded,
+                                              color: AppColors.second,
+                                              size: 28,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    content: SizedBox(
+                                      width: screenWidth * 0.85,   // <--- Control dialog width here
+                                      height: screenHeight * 0.55,  // <--- Control dialog height here
+                                      child: SingleChildScrollView(
+                                        child: Wrap(
+                                          spacing: 10,
+                                          runSpacing: 10,
+                                          children: List.generate(basket.redAvgsB.length, (i) {
+                                            return Card(
+                                              color: AppColors.first,
+                                              margin: const EdgeInsets.symmetric(vertical: 5),
+                                              child: Padding(
+                                                padding: const EdgeInsets.fromLTRB(13,5,5,5),
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Container(
+                                                      width: 35,
+                                                      height: 35,
+                                                      decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                          color: Colors.black,  // border color
+                                                          width: 1,             // border width
                                                         ),
-                                                      ],
-                                                      color: Color.fromARGB(
-                                                        255,
-                                                        basket.redAvgsB[i],
-                                                        basket.blueAvgsB[i],
-                                                        basket.greenAvgsB[i],
+                                                        color: Color.fromARGB(
+                                                          255,
+                                                          basket.redAvgsB[i],
+                                                          basket.greenAvgsB[i],
+                                                          basket.blueAvgsB[i],
+                                                        ),
                                                       ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            6,
-                                                          ),
                                                     ),
-                                                  ),
-                                                  IconButton(
-                                                    onPressed: () {
-                                                      redAvgs.add(
-                                                        basket.redAvgsB[i],
-                                                      );
-                                                      greenAvgs.add(
-                                                        basket.greenAvgsB[i],
-                                                      );
-                                                      blueAvgs.add(
-                                                        basket.blueAvgsB[i],
-                                                      );
-                                                      basket.redAvgsB.removeAt(
-                                                        i,
-                                                      );
-                                                      basket.greenAvgsB
-                                                          .removeAt(i);
-                                                      basket.blueAvgsB.removeAt(
-                                                        i,
-                                                      );
-                                                    },
-                                                    icon: Icon(
-                                                      Icons.delete,
-                                                      color: Colors.red,
+                                                    IconButton(
+                                                      onPressed: () {
+                                                        redAvgs.add(basket.redAvgsB[i]);
+                                                        greenAvgs.add(basket.greenAvgsB[i]);
+                                                        blueAvgs.add(basket.blueAvgsB[i]);
+
+                                                        basket.redAvgsB.removeAt(i);
+                                                        basket.greenAvgsB.removeAt(i);
+                                                        basket.blueAvgsB.removeAt(i);
+
+
+                                                        Navigator.pop(context);
+                                                      },
+                                                      icon: Icon(Icons.double_arrow_rounded, color: Colors.white),
                                                     ),
-                                                  ),
-                                                ],
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          );
-                                        },
+                                            );
+                                          }),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 );
+
                               },
                               child: Image.asset(
                                 'assets/Basket.png',
@@ -442,10 +458,7 @@ class _AddPageState extends State<AddPage> {
                                       final g = greenAvgs[index];
                                       final b = blueAvgs[index];
                                       final color = Color.fromARGB(
-                                        255,
-                                        r,
-                                        g,
-                                        b,
+                                        255, r, g, b,
                                       );
 
                                       return Draggable(
@@ -457,25 +470,29 @@ class _AddPageState extends State<AddPage> {
                                         },
                                         feedback: Material(
                                           color: Colors.transparent,
-                                          child: Container(
-                                            width: 80,
-                                            height: 80,
-                                            decoration: BoxDecoration(
-                                              color: color.withOpacity(0.7),
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withOpacity(0.2),
-                                                  blurRadius: 6,
-                                                ),
-                                              ],
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(
+                                              18.0,
                                             ),
-                                            child: Center(
-                                              child: Image.asset(
-                                                'assets/shirt.png',
-                                                scale: 15,
+                                            child: Container(
+
+                                              decoration: BoxDecoration(
+                                                color: color.withOpacity(0.7),
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.2),
+                                                    blurRadius: 6,
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Center(
+                                                child: Image.asset(
+                                                  'assets/shirt.png',
+                                                  scale: 13,
+                                                ),
                                               ),
                                             ),
                                           ),
