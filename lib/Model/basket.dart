@@ -5,7 +5,7 @@ part 'basket.g.dart';
 @HiveType(typeId: 0)
 class Basket extends HiveObject {
   @HiveField(0)
-  late String name;
+  String name = "";
   @HiveField(1)
   List<int> redAvgsA = [];
   @HiveField(2)

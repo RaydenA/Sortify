@@ -19,13 +19,36 @@ class AddPage extends StatefulWidget {
 class _AddPageState extends State<AddPage> {
   final AppData data = AppData();
   TextEditingController nameController = TextEditingController();
+  bool isLoaded = false;
   // Simpan nilai RGB rata-rata & nama
   late String name = nameController.text;
   List<int> redAvgs = [];
   List<int> greenAvgs = [];
   List<int> blueAvgs = [];
 
+  List<int> tempA_R = [];
+  List<int> tempA_G = [];
+  List<int> tempA_B = [];
+
+  List<int> tempB_R = [];
+  List<int> tempB_G = [];
+  List<int> tempB_B = [];
+
   late var basket = Basket();
+
+  void loadBasketToTemp(Basket basket) {
+    // Temp A
+    tempA_R = List.from(basket.redAvgsA);
+    tempA_G = List.from(basket.greenAvgsA);
+    tempA_B = List.from(basket.blueAvgsA);
+
+    // Temp B
+    tempB_R = List.from(basket.redAvgsB);
+    tempB_G = List.from(basket.greenAvgsB);
+    tempB_B = List.from(basket.blueAvgsB);
+
+  }
+
 
   // Fungsi cek kemiripan warna
   bool isColorSimilar(Color newColor) {
@@ -43,13 +66,16 @@ class _AddPageState extends State<AddPage> {
 
   @override
   Widget build(BuildContext context) {
+
     final basketPreset = ModalRoute.of(context)!.settings.arguments as Basket?;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    if (basketPreset != null) {
+    if (basketPreset != null && !isLoaded) {
       basket = basketPreset;
       nameController.text = basket.name;
+      loadBasketToTemp(basketPreset);  // <-- temp di-load sekali
+      isLoaded = true;                 // <-- tidak load lagi
     }
 
     return Scaffold(
@@ -132,257 +158,287 @@ class _AddPageState extends State<AddPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        DragTarget(
-                          builder: (context, candidateData, rejectedData) {
-                            return InkWell(
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    insetPadding: EdgeInsets.all(20), // Controls max width
-                                    backgroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    title: Stack(
-                                      children: [
-                                        // Title text
-                                        Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Text(
-                                            'Basket A',
-                                            style: TextStyle(
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
+                        Column(
+                          children: [
+                            DragTarget(
+                              builder: (context, candidateData, rejectedData) {
+                                return InkWell(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        insetPadding: EdgeInsets.all(20), // Controls max width
+                                        backgroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10),
                                         ),
-
-                                        // Close icon
-                                        Positioned(
-                                          right: 0,
-                                          top: 0,
-                                          child: InkWell(
-                                            onTap: () => Navigator.pop(context),
-                                            child: Icon(
-                                              Icons.cancel_rounded,
-                                              color: AppColors.second,
-                                              size: 28,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    content: SizedBox(
-                                      width: screenWidth * 0.85,   // <--- Control dialog width here
-                                      height: screenHeight * 0.55,  // <--- Control dialog height here
-                                      child: SingleChildScrollView(
-                                        child: Wrap(
-                                          spacing: 10,
-                                          runSpacing: 10,
-                                          children: List.generate(basket.redAvgsA.length, (i) {
-                                            return Card(
-                                              color: AppColors.first,
-                                              margin: const EdgeInsets.symmetric(vertical: 5),
-                                              child: Padding(
-                                                padding: const EdgeInsets.fromLTRB(13,5,5,5),
-                                                child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  children: [
-                                                    Container(
-                                                      width: 35,
-                                                      height: 35,
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                          color: Colors.black,  // border color
-                                                          width: 1,             // border width
-                                                        ),
-                                                        color: Color.fromARGB(
-                                                          255,
-                                                          basket.redAvgsA[i],
-                                                          basket.greenAvgsA[i],
-                                                          basket.blueAvgsA[i],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    IconButton(
-                                                      onPressed: () {
-                                                        redAvgs.add(basket.redAvgsA[i]);
-                                                        greenAvgs.add(basket.greenAvgsA[i]);
-                                                        blueAvgs.add(basket.blueAvgsA[i]);
-
-                                                        basket.redAvgsA.removeAt(i);
-                                                        basket.greenAvgsA.removeAt(i);
-                                                        basket.blueAvgsA.removeAt(i);
-
-
-                                                        Navigator.pop(context);
-                                                      },
-                                                      icon: Icon(Icons.double_arrow_rounded, color: Colors.white),
-                                                    ),
-                                                  ],
+                                        title: Stack(
+                                          children: [
+                                            // Title text
+                                            Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Text(
+                                                'Non-colorfast clothes',
+                                                style: TextStyle(
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
                                               ),
-                                            );
-                                          }),
+                                            ),
+
+                                            // Close icon
+                                            Positioned(
+                                              right: 0,
+                                              top: 0,
+                                              child: InkWell(
+                                                onTap: () => Navigator.pop(context),
+                                                child: Icon(
+                                                  Icons.cancel_rounded,
+                                                  color: AppColors.second,
+                                                  size: 28,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        content: SizedBox(
+                                          width: screenWidth * 0.85,   // <--- Control dialog width here
+                                          height: screenHeight * 0.55,  // <--- Control dialog height here
+                                          child: SingleChildScrollView(
+                                            child: Wrap(
+                                              spacing: 10,
+                                              runSpacing: 10,
+                                              children: List.generate(tempA_R.length, (i) {
+                                                return Card(
+                                                  color: AppColors.first,
+                                                  margin: const EdgeInsets.symmetric(vertical: 5),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.fromLTRB(13, 5, 5, 5),
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        Container(
+                                                          width: 35,
+                                                          height: 35,
+                                                          decoration: BoxDecoration(
+                                                            border: Border.all(color: Colors.black, width: 1),
+                                                            color: Color.fromARGB(
+                                                              255,
+                                                              tempA_R[i],
+                                                              tempA_G[i],
+                                                              tempA_B[i],
+                                                            ),
+                                                          ),
+                                                        ),
+
+                                                        // === Button balikan ke grid avgs ===
+                                                        IconButton(
+                                                          onPressed: () {
+                                                            // Kembalikan ke avgs grid
+                                                            redAvgs.add(tempA_R[i]);
+                                                            greenAvgs.add(tempA_G[i]);
+                                                            blueAvgs.add(tempA_B[i]);
+
+                                                            // Hapus dari tempB
+                                                            tempA_R.removeAt(i);
+                                                            tempA_G.removeAt(i);
+                                                            tempA_B.removeAt(i);
+
+                                                            setState(() {});
+                                                            Navigator.pop(context);
+                                                          },
+                                                          icon: Icon(Icons.double_arrow_rounded, color: Colors.white),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                );
+                                              }),
+
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                    ),
+                                    );
+
+                                  },
+                                  child: Image.asset(
+                                    'assets/Basket.png',
+                                    width: screenWidth * 0.475,
                                   ),
                                 );
-
                               },
-                              child: Image.asset(
-                                'assets/Basket.png',
-                                width: screenWidth * 0.475,
+                              onWillAccept: (data) => true,
+                              onAccept: (data) {
+                                final item = data as Map<String, dynamic>;
+                                final i = item['index'];
+
+                                // Masukkan ke basket A
+                                tempA_R.add(redAvgs[i]);
+                                tempA_G.add(greenAvgs[i]);
+                                tempA_B.add(blueAvgs[i]);
+
+                                // Hapus dari grid avgs
+                                redAvgs.removeAt(i);
+                                greenAvgs.removeAt(i);
+                                blueAvgs.removeAt(i);
+
+                                setState(() {});
+                              },
+                            ),
+                            Text(
+                              'Non-colorfast clothes',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
                               ),
-                            );
-                          },
-                          onWillAccept: (data) => true,
-                          onAccept: (data) {
-                            final item = data as Map<String, dynamic>;
-                            basket.redAvgsA.add(item['r']);
-                            basket.greenAvgsA.add(item['g']);
-                            basket.blueAvgsA.add(item['b']);
-
-                            // basket.save();
-
-                            setState(() {
-                              redAvgs.removeAt(item['index']);
-                              greenAvgs.removeAt(item['index']);
-                              blueAvgs.removeAt(item['index']);
-                            });
-                          },
+                            ),
+                          ],
                         ),
 
                         SizedBox(width: screenWidth * 0.01),
 
-                        DragTarget(
-                          builder: (context, candidateData, rejectedData) {
-                            return InkWell(
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    insetPadding: EdgeInsets.all(20), // Controls max width
-                                    backgroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    title: Stack(
-                                      children: [
-                                        // Title text
-                                        Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Text(
-                                            'Basket B',
-                                            style: TextStyle(
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
+                        Column(
+                          children: [
+                            DragTarget(
+                              builder: (context, candidateData, rejectedData) {
+                                return InkWell(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        insetPadding: EdgeInsets.all(20), // Controls max width
+                                        backgroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10),
                                         ),
-
-                                        // Close icon
-                                        Positioned(
-                                          right: 0,
-                                          top: 0,
-                                          child: InkWell(
-                                            onTap: () => Navigator.pop(context),
-                                            child: Icon(
-                                              Icons.cancel_rounded,
-                                              color: AppColors.second,
-                                              size: 28,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    content: SizedBox(
-                                      width: screenWidth * 0.85,   // <--- Control dialog width here
-                                      height: screenHeight * 0.55,  // <--- Control dialog height here
-                                      child: SingleChildScrollView(
-                                        child: Wrap(
-                                          spacing: 10,
-                                          runSpacing: 10,
-                                          children: List.generate(basket.redAvgsB.length, (i) {
-                                            return Card(
-                                              color: AppColors.first,
-                                              margin: const EdgeInsets.symmetric(vertical: 5),
-                                              child: Padding(
-                                                padding: const EdgeInsets.fromLTRB(13,5,5,5),
-                                                child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  children: [
-                                                    Container(
-                                                      width: 35,
-                                                      height: 35,
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                          color: Colors.black,  // border color
-                                                          width: 1,             // border width
-                                                        ),
-                                                        color: Color.fromARGB(
-                                                          255,
-                                                          basket.redAvgsB[i],
-                                                          basket.greenAvgsB[i],
-                                                          basket.blueAvgsB[i],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    IconButton(
-                                                      onPressed: () {
-                                                        redAvgs.add(basket.redAvgsB[i]);
-                                                        greenAvgs.add(basket.greenAvgsB[i]);
-                                                        blueAvgs.add(basket.blueAvgsB[i]);
-
-                                                        basket.redAvgsB.removeAt(i);
-                                                        basket.greenAvgsB.removeAt(i);
-                                                        basket.blueAvgsB.removeAt(i);
-
-
-                                                        Navigator.pop(context);
-                                                      },
-                                                      icon: Icon(Icons.double_arrow_rounded, color: Colors.white),
-                                                    ),
-                                                  ],
+                                        title: Stack(
+                                          children: [
+                                            // Title text
+                                            Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Text(
+                                                'Colorfast clothes',
+                                                style: TextStyle(
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
                                               ),
-                                            );
-                                          }),
+                                            ),
+
+                                            // Close icon
+                                            Positioned(
+                                              right: 0,
+                                              top: 0,
+                                              child: InkWell(
+                                                onTap: () => Navigator.pop(context),
+                                                child: Icon(
+                                                  Icons.cancel_rounded,
+                                                  color: AppColors.second,
+                                                  size: 28,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        content: SizedBox(
+                                          width: screenWidth * 0.85,   // <--- Control dialog width here
+                                          height: screenHeight * 0.55,  // <--- Control dialog height here
+                                          child: SingleChildScrollView(
+                                            child: Wrap(
+                                              spacing: 10,
+                                              runSpacing: 10,
+                                              children: List.generate(tempB_R.length, (i) {
+                                                return Card(
+                                                  color: AppColors.first,
+                                                  margin: const EdgeInsets.symmetric(vertical: 5),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.fromLTRB(13, 5, 5, 5),
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        Container(
+                                                          width: 35,
+                                                          height: 35,
+                                                          decoration: BoxDecoration(
+                                                            border: Border.all(color: Colors.black, width: 1),
+                                                            color: Color.fromARGB(
+                                                              255,
+                                                              tempB_R[i],
+                                                              tempB_G[i],
+                                                              tempB_B[i],
+                                                            ),
+                                                          ),
+                                                        ),
+
+                                                        // === Button balikan ke grid avgs ===
+                                                        IconButton(
+                                                          onPressed: () {
+                                                            // Kembalikan ke avgs grid
+                                                            redAvgs.add(tempB_R[i]);
+                                                            greenAvgs.add(tempB_G[i]);
+                                                            blueAvgs.add(tempB_B[i]);
+
+                                                            // Hapus dari tempB
+                                                            tempB_R.removeAt(i);
+                                                            tempB_G.removeAt(i);
+                                                            tempB_B.removeAt(i);
+
+                                                            setState(() {});
+                                                            Navigator.pop(context);
+                                                          },
+                                                          icon: Icon(Icons.double_arrow_rounded, color: Colors.white),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                );
+                                              }),
+
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                    ),
+                                    );
+
+                                  },
+                                  child: Image.asset(
+                                    'assets/Basket.png',
+                                    width: screenWidth * 0.475,
                                   ),
                                 );
-
                               },
-                              child: Image.asset(
-                                'assets/Basket.png',
-                                width: screenWidth * 0.475,
+                              onWillAccept: (data) => true,
+                              onAccept: (data) {
+                                final item = data as Map<String, dynamic>;
+                                final i = item['index'];
+
+                                // Masukkan ke basket A
+                                tempB_R.add(redAvgs[i]);
+                                tempB_G.add(greenAvgs[i]);
+                                tempB_B.add(blueAvgs[i]);
+
+                                // Hapus dari grid avgs
+                                redAvgs.removeAt(i);
+                                greenAvgs.removeAt(i);
+                                blueAvgs.removeAt(i);
+
+                                setState(() {});
+                              },
+                            ),
+                            Text(
+                              'Colorfast clothes',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
                               ),
-                            );
-                          },
-                          onWillAccept: (data) => true,
-                          onAccept: (data) {
-                            final item = data as Map<String, dynamic>;
-                            basket.redAvgsB.add(item['r']);
-                            basket.greenAvgsB.add(item['g']);
-                            basket.blueAvgsB.add(item['b']);
-
-                            // basket.save();
-
-                            setState(() {
-                              redAvgs.removeAt(item['index']);
-                              greenAvgs.removeAt(item['index']);
-                              blueAvgs.removeAt(item['index']);
-                            });
-                          },
+                            ),
+                          ],
                         ),
                       ],
                     ),
 
-                    SizedBox(height: screenHeight * 0.015),
+                    SizedBox(height: screenHeight * 0.03),
 
                     ConstrainedBox(
                       constraints: BoxConstraints(
@@ -712,12 +768,35 @@ class _AddPageState extends State<AddPage> {
                                 ),
                                 onPressed: () {
                                   final box = Boxes.getBasket();
+
                                   if (basketPreset != null) {
+                                    // Update basket existing
                                     basketPreset.name = nameController.text;
+
+                                    basketPreset.redAvgsA = List.from(tempA_R);
+                                    basketPreset.greenAvgsA = List.from(tempA_G);
+                                    basketPreset.blueAvgsA = List.from(tempA_B);
+
+                                    basketPreset.redAvgsB = List.from(tempB_R);
+                                    basketPreset.greenAvgsB = List.from(tempB_G);
+                                    basketPreset.blueAvgsB = List.from(tempB_B);
+
+                                    basketPreset.save();
                                   } else {
-                                    basket.name = name;
+                                    // New basket
+                                    basket.name = nameController.text;
+
+                                    basket.redAvgsA = List.from(tempA_R);
+                                    basket.greenAvgsA = List.from(tempA_G);
+                                    basket.blueAvgsA = List.from(tempA_B);
+
+                                    basket.redAvgsB = List.from(tempB_R);
+                                    basket.greenAvgsB = List.from(tempB_G);
+                                    basket.blueAvgsB = List.from(tempB_B);
+
                                     box.add(basket);
                                   }
+
                                   Navigator.pop(context);
                                 },
                                 child: Text(
@@ -764,7 +843,7 @@ class _AddPageState extends State<AddPage> {
                         ),
                       ),
                       onPressed: () {
-                        if (redAvgs.length < 2) {
+                        if (tempA_R.isEmpty || tempB_R.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
@@ -790,9 +869,13 @@ class _AddPageState extends State<AddPage> {
                             builder: (context) => const SortPage(),
                             settings: RouteSettings(
                               arguments: {
-                                'redAvgs': redAvgs,
-                                'greenAvgs': greenAvgs,
-                                'blueAvgs': blueAvgs,
+                                'a_red': tempA_R,
+                                'a_green': tempA_G,
+                                'a_blue': tempA_B,
+
+                                'b_red': tempB_R,
+                                'b_green': tempB_G,
+                                'b_blue': tempB_B,
                               },
                             ),
                           ),

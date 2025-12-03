@@ -262,7 +262,7 @@ class _HomePageState extends State<Homepage> with RouteAware {
                             Navigator.pushNamed(
                               context,
                               '/addPage',
-                              arguments: basket,
+                              arguments: baskets[index], // index item hive
                             );
                           },
                           child: Card(

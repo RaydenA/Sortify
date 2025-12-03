@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:iotproject/Function/data.dart'; // ambil AppData
@@ -17,9 +18,15 @@ class _SortPageState extends State<SortPage> {
   bool isSorting = false;
   String statusText = "Ready to sort";
 
-  late List<int> redAvgs;
-  late List<int> greenAvgs;
-  late List<int> blueAvgs;
+  late List<int> a_red;
+  late List<int> a_green;
+  late List<int> a_blue;
+
+  late List<int> b_red;
+  late List<int> b_green;
+  late List<int> b_blue;
+
+  RawDatagramSocket? udpSocket;
 
   @override
   void didChangeDependencies() {
@@ -27,11 +34,16 @@ class _SortPageState extends State<SortPage> {
 
     // Ambil data warna dari arguments AddPage
     final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    redAvgs = List<int>.from(args['redAvgs']);
-    greenAvgs = List<int>.from(args['greenAvgs']);
-    blueAvgs = List<int>.from(args['blueAvgs']);
+    a_red   = List<int>.from(args['a_red']);
+    a_green = List<int>.from(args['a_green']);
+    a_blue  = List<int>.from(args['a_blue']);
+
+    b_red   = List<int>.from(args['b_red']);
+    b_green = List<int>.from(args['b_green']);
+    b_blue  = List<int>.from(args['b_blue']);
 
     startSorting();
+    startListeningUDP();
   }
 
   // === Fungsi mulai sorting ===
@@ -41,21 +53,25 @@ class _SortPageState extends State<SortPage> {
       statusText = "Starting sorting process...";
     });
 
-    // buat list warna untuk dikirim ke ESP32
-    List<Map<String, int>> colorList = [];
-    for (int i = 0; i < redAvgs.length; i++) {
-      colorList.add({
-        "red": redAvgs[i],
-        "green": greenAvgs[i],
-        "blue": blueAvgs[i],
-      });
-    }
+    // Buat map warna untuk basket A dan B sesuai ESP32
+    final Map<String, dynamic> colorData = {
+      "A": List.generate(a_red.length, (i) => {
+        "red": a_red[i],
+        "green": a_green[i],
+        "blue": a_blue[i],
+      }),
+      "B": List.generate(b_red.length, (i) => {
+        "red": b_red[i],
+        "green": b_green[i],
+        "blue": b_blue[i],
+      }),
+    };
 
     try {
       final response = await http.post(
         Uri.parse("http://${data.esp32Ip}/sort"),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode(colorList),
+        body: jsonEncode(colorData),
       );
 
       if (response.statusCode == 200) {
@@ -86,12 +102,41 @@ class _SortPageState extends State<SortPage> {
       print("Failed to send stop signal: $e");
     });
 
-    // beri jeda 2 detik sebelum kembali ke AddPage
     await Future.delayed(const Duration(seconds: 1));
 
     if (mounted) {
       Navigator.pop(context);
     }
+  }
+
+  // === UDP Listener ===
+  void startListeningUDP() async {
+    udpSocket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, 4210);
+    udpSocket!.listen((event) {
+      if (event == RawSocketEvent.read) {
+        Datagram? dg = udpSocket!.receive();
+        if (dg != null) {
+          String msg = utf8.decode(dg.data);
+          print("UDP received: $msg");
+
+          try {
+            var dataJson = jsonDecode(msg);
+            if (dataJson["action"] == "stop") {
+              print("Received stop via UDP!");
+              stopSorting();
+            }
+          } catch (e) {
+            print("JSON parse error: $e");
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    udpSocket?.close();
+    super.dispose();
   }
 
   @override

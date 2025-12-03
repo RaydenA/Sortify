@@ -97,9 +97,15 @@ class _WifiSorterPageState extends State<WifiSorterPage> {
       );
 
       print("Response: ${response.body}");
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("WiFi sent to ESP32")),
       );
+
+      // ── Reset TextField ──
+      ssidController.text = "";
+      passController.text = "";
+
     } catch (e) {
       print("Error sending WiFi: $e");
       ScaffoldMessenger.of(context).showSnackBar(
@@ -108,6 +114,7 @@ class _WifiSorterPageState extends State<WifiSorterPage> {
     }
   }
 
+
   // ───────────────────────────────
   // SHOW MODAL LIST ESP32
   // ───────────────────────────────
@@ -115,7 +122,7 @@ class _WifiSorterPageState extends State<WifiSorterPage> {
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
       ),
       builder: (context) {
         return Container(
@@ -125,7 +132,7 @@ class _WifiSorterPageState extends State<WifiSorterPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Available ESP32 Devices",
+                "Available Device",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 16),
@@ -133,7 +140,7 @@ class _WifiSorterPageState extends State<WifiSorterPage> {
                 child: espList.isEmpty
                     ? Center(
                   child: Text(
-                    "Searching for ESP32...",
+                    "Searching for Device...",
                     style: TextStyle(fontSize: 16),
                   ),
                 )
@@ -183,9 +190,9 @@ class _WifiSorterPageState extends State<WifiSorterPage> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: AppColors.fourth,
+      backgroundColor: AppColors.third,
       appBar: AppBar(
-        backgroundColor: AppColors.fourth,
+        backgroundColor: AppColors.third,
         toolbarHeight: 60,
         leadingWidth: 72,
         leading: IconButton(
@@ -196,73 +203,140 @@ class _WifiSorterPageState extends State<WifiSorterPage> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(height: screenHeight * 0.005),
-              // Card Select ESP32
-              Container(
-                height: screenHeight * 0.1,
-                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                decoration: BoxDecoration(
-                  color: AppColors.fourth,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 10,
-                      offset: Offset(4, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 24),
+            child: Column(
+              children: [
+                SizedBox(height: screenHeight * 0.005),
+
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch, // ← ini untuk align ke kiri
                   children: [
-                    Image.asset('assets/shirt.png', scale: 25),
-                    SizedBox(width: screenWidth * 0.03),
                     Text(
-                      data.esp32Ip.isEmpty
-                          ? "Select ESP32"
-                          : "Selected: ${data.esp32Ip}",
-                      style: TextStyle(fontSize: 16),
+                      'Select Device',
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
-                    Spacer(),
-                    IconButton(
-                      onPressed: showEspModal,
-                      icon: Icon(Icons.arrow_forward_ios_rounded),
+                    SizedBox(height: screenHeight * 0.005),
+                    Text(
+                      'Find the device you want to use.',
+                      style: TextStyle(fontSize: 13),
                     ),
                   ],
                 ),
-              ),
-              // Input WiFi
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24),
-                child: Column(
+
+
+                // Input WiFi
+                SizedBox(height: screenHeight * 0.03),
+                // Card Select ESP32
+                Container(
+                  height: screenHeight * 0.1,
+                  padding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: AppColors.fourth,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        offset: Offset(4, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Image.asset('assets/shirt.png', scale: 25),
+                      SizedBox(width: screenWidth * 0.03),
+                      Text(
+                        data.esp32Ip.isEmpty
+                            ? "No Sorter Selected"
+                            : "Selected: ${data.esp32Ip}",
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      Spacer(),
+                      IconButton(
+                        onPressed: showEspModal,
+                        icon: Icon(Icons.arrow_forward_ios_rounded),
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: screenHeight * 0.03),
+
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch, // ← ini untuk align ke kiri
                   children: [
-                    SizedBox(height: screenHeight * 0.03),
-                    TextField(
-                      controller: ssidController,
-                      decoration: InputDecoration(
-                        labelText: "SSID",
-                        border: OutlineInputBorder(),
-                      ),
+                    Text(
+                      'Change WiFi',
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: screenHeight * 0.03),
-                    TextField(
-                      controller: passController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: "Password",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.03),
-                    ElevatedButton(
-                      onPressed: sendWifiToESP,
-                      child: Text("Connect ESP32 to WiFi"),
+                    SizedBox(height: screenHeight * 0.005),
+                    Text(
+                      'Change your sorter WiFi to the one you use.',
+                      style: TextStyle(fontSize: 13),
                     ),
                   ],
                 ),
-              ),
-            ],
+
+
+                // Input WiFi
+                SizedBox(height: screenHeight * 0.03),
+
+                TextField(
+                  controller: ssidController,
+                  decoration: InputDecoration(
+                    labelText: "SSID",
+                    filled: true,           // important to enable background color
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+
+                SizedBox(height: screenHeight * 0.03),
+
+                TextField(
+                  controller: passController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: "Password",
+                    filled: true,           // important to enable background color
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+
+                SizedBox(height: screenHeight * 0.03),
+
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: sendWifiToESP,
+                  child: SizedBox(
+                    width: 225,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.wifi, color: Colors.white,),
+                        SizedBox(width: screenWidth * 0.03,),
+                        Text(
+                          "Connect Sorter to WiFi",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
