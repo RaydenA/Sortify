@@ -303,7 +303,7 @@ class _HomePageState extends State<Homepage> with RouteAware {
                                     children: [
                                       Row(
                                         children: [
-                                          Text("Basket A: "),
+                                          Text("Non-colorfast: "),
                                           Wrap(
                                             spacing: 10,
                                             runSpacing: 10,
@@ -335,7 +335,7 @@ class _HomePageState extends State<Homepage> with RouteAware {
                                       SizedBox(height: 10),
                                       Row(
                                         children: [
-                                          Text("Basket B: "),
+                                          Text("Colorfast: "),
                                           Wrap(
                                             spacing: 10,
                                             runSpacing: 10,

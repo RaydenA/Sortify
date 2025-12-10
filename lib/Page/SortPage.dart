@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:iotproject/Function/data.dart'; // ambil AppData
+import 'package:iotproject/Function/data.dart';
 import 'package:lottie/lottie.dart';
 
 class SortPage extends StatefulWidget {
@@ -13,18 +13,18 @@ class SortPage extends StatefulWidget {
 }
 
 class _SortPageState extends State<SortPage> {
-  final AppData data = AppData(); // ambil IP dari singleton AppData
+  final AppData data = AppData();
 
   bool isSorting = false;
   String statusText = "Ready to sort";
 
-  late List<int> a_red;
-  late List<int> a_green;
-  late List<int> a_blue;
-
-  late List<int> b_red;
-  late List<int> b_green;
-  late List<int> b_blue;
+  // ganti dari int ke List<int> supaya bisa kirim semua warna
+  List<int> redA = [];
+  List<int> greenA = [];
+  List<int> blueA = [];
+  List<int> redB = [];
+  List<int> greenB = [];
+  List<int> blueB = [];
 
   RawDatagramSocket? udpSocket;
 
@@ -32,39 +32,38 @@ class _SortPageState extends State<SortPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    // Ambil data warna dari arguments AddPage
-    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    a_red   = List<int>.from(args['a_red']);
-    a_green = List<int>.from(args['a_green']);
-    a_blue  = List<int>.from(args['a_blue']);
+    final args =
+    ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
-    b_red   = List<int>.from(args['b_red']);
-    b_green = List<int>.from(args['b_green']);
-    b_blue  = List<int>.from(args['b_blue']);
+    // Ambil list warna A
+    redA = List<int>.from(args['a_red']);
+    greenA = List<int>.from(args['a_green']);
+    blueA = List<int>.from(args['a_blue']);
 
-    startSorting();
+    // Ambil list warna B
+    redB = List<int>.from(args['b_red']);
+    greenB = List<int>.from(args['b_green']);
+    blueB = List<int>.from(args['b_blue']);
+
+    if (!isSorting) startSorting();
+
     startListeningUDP();
   }
 
-  // === Fungsi mulai sorting ===
   Future<void> startSorting() async {
     setState(() {
       isSorting = true;
-      statusText = "Starting sorting process...";
+      statusText = "Starting sorting...";
     });
 
-    // Buat map warna untuk basket A dan B sesuai ESP32
-    final Map<String, dynamic> colorData = {
-      "A": List.generate(a_red.length, (i) => {
-        "red": a_red[i],
-        "green": a_green[i],
-        "blue": a_blue[i],
-      }),
-      "B": List.generate(b_red.length, (i) => {
-        "red": b_red[i],
-        "green": b_green[i],
-        "blue": b_blue[i],
-      }),
+    // kirim semua list warna ke ESP32
+    final colorData = {
+      "red_a": redA,
+      "green_a": greenA,
+      "blue_a": blueA,
+      "red_b": redB,
+      "green_b": greenB,
+      "blue_b": blueB,
     };
 
     try {
@@ -75,29 +74,21 @@ class _SortPageState extends State<SortPage> {
       );
 
       if (response.statusCode == 200) {
-        setState(() {
-          statusText = "Sorting started. Detecting colors...";
-        });
+        setState(() => statusText = "Sorting started...");
       } else {
-        setState(() {
-          statusText = "Failed to start sorting (HTTP ${response.statusCode})";
-        });
+        setState(() => statusText = "Failed (HTTP ${response.statusCode})");
       }
     } catch (e) {
-      setState(() {
-        statusText = "Connection failed: $e";
-      });
+      setState(() => statusText = "Connection failed: $e");
     }
   }
 
-  // === Fungsi menghentikan sorting ===
   Future<void> stopSorting() async {
     setState(() {
       isSorting = false;
       statusText = "Stopping sorting...";
     });
 
-    // kirim sinyal stop tanpa menunggu respons
     http.get(Uri.parse("http://${data.esp32Ip}/stop")).catchError((e) {
       print("Failed to send stop signal: $e");
     });
@@ -109,25 +100,37 @@ class _SortPageState extends State<SortPage> {
     }
   }
 
-  // === UDP Listener ===
+  Future<void> stopSortingFull() async {
+    setState(() {
+      isSorting = false;
+      statusText = "Stopping sorting...";
+    });
+
+    http.get(Uri.parse("http://${data.esp32Ip}/stop")).catchError((e) {
+      print("Failed to send stop signal: $e");
+    });
+
+    udpSocket?.close();
+    udpSocket = null;
+
+    await Future.delayed(const Duration(seconds: 1));
+
+    if (mounted) Navigator.pushReplacementNamed(context, '/validation');
+  }
+
   void startListeningUDP() async {
     udpSocket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, 4210);
     udpSocket!.listen((event) {
       if (event == RawSocketEvent.read) {
-        Datagram? dg = udpSocket!.receive();
+        final dg = udpSocket!.receive();
         if (dg != null) {
-          String msg = utf8.decode(dg.data);
+          final msg = utf8.decode(dg.data);
           print("UDP received: $msg");
 
           try {
-            var dataJson = jsonDecode(msg);
-            if (dataJson["action"] == "stop") {
-              print("Received stop via UDP!");
-              stopSorting();
-            }
-          } catch (e) {
-            print("JSON parse error: $e");
-          }
+            final json = jsonDecode(msg);
+            if (json["action"] == "stop") stopSortingFull();
+          } catch (_) {}
         }
       }
     });
@@ -152,11 +155,11 @@ class _SortPageState extends State<SortPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Lottie.asset(
-                    'assets/animations/sort.json',
-                    repeat: true,
-                    animate: true,
-                    height: 350,
-                    width: 350
+                  'assets/animations/sort.json',
+                  repeat: true,
+                  animate: true,
+                  height: 350,
+                  width: 350,
                 ),
                 Text(
                   statusText,
@@ -166,7 +169,9 @@ class _SortPageState extends State<SortPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: screenHeight * 0.2,),
+                SizedBox(
+                  height: screenHeight * 0.2,
+                ),
                 ElevatedButton(
                   onPressed: stopSorting,
                   style: ElevatedButton.styleFrom(
@@ -179,7 +184,9 @@ class _SortPageState extends State<SortPage> {
                     color: Colors.white,
                   ),
                 ),
-                SizedBox(height: screenHeight * 0.1,)
+                SizedBox(
+                  height: screenHeight * 0.1,
+                )
               ],
             ),
           ),
