@@ -1,6 +1,8 @@
 import 'package:iotproject/Page/HomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:iotproject/Function/colorpalette.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
     Future.delayed(
-      const Duration(seconds: 5),
+      const Duration(seconds: 3),
           () {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const Homepage()),
@@ -39,7 +41,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         width: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFf6c5c5), Color(0xFFdec1ee)],
+            colors: [AppColors.first, AppColors.third],
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
           ),
@@ -48,6 +50,11 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           alignment: Alignment.center,
           child: Image.asset(
             'assets/Logo.png',
+          )
+              .animate()
+              .fadeIn(
+            delay: 1.seconds,
+            duration: 900.milliseconds,
           ),
         ),
       ),

@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:iotproject/Page/SortPage.dart';
 import 'package:iotproject/Page/DetectPage.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
@@ -64,6 +67,23 @@ class _AddPageState extends State<AddPage> {
     return false;
   }
 
+  // buat manggil api nama warna
+  Future<String?> getColorName(int r, int g, int b) async {
+    try {
+      final url = Uri.parse('https://www.thecolorapi.com/id?rgb=rgb($r,$g,$b)');
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['name']['value'];
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -79,10 +99,10 @@ class _AddPageState extends State<AddPage> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.fourth,
+      backgroundColor: AppColors.first,
       appBar: AppBar(
         toolbarHeight: 60,
-        backgroundColor: AppColors.fourth,
+        backgroundColor: AppColors.first,
         leadingWidth: 72,
         leading: IconButton(
           color: Colors.black,
@@ -150,7 +170,7 @@ class _AddPageState extends State<AddPage> {
                   children: [
                     Text(
                       'Click* basket to check color',
-                      style: TextStyle(color: Colors.white, fontSize: 13),
+                      style: TextStyle(color: AppColors.fourth, fontSize: 13),
                     ),
 
                     SizedBox(height: screenHeight * 0.005),
@@ -194,7 +214,7 @@ class _AddPageState extends State<AddPage> {
                                                 onTap: () => Navigator.pop(context),
                                                 child: Icon(
                                                   Icons.cancel_rounded,
-                                                  color: AppColors.second,
+                                                  color: Colors.red,
                                                   size: 28,
                                                 ),
                                               ),
@@ -215,8 +235,8 @@ class _AddPageState extends State<AddPage> {
                                                   child: Padding(
                                                     padding: const EdgeInsets.fromLTRB(13, 5, 5, 5),
                                                     child: Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                       children: [
+                                                        // Kotak warna
                                                         Container(
                                                           width: 35,
                                                           height: 35,
@@ -231,15 +251,52 @@ class _AddPageState extends State<AddPage> {
                                                           ),
                                                         ),
 
-                                                        // === Button balikan ke grid avgs ===
+                                                        SizedBox(width: 12),
+
+                                                        // ===== COLUMN DETAIL WARNA =====
+                                                        Expanded(
+                                                          child: Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              Text(
+                                                                "R:${tempA_R[i]}  G:${tempA_G[i]}  B:${tempA_B[i]}",
+                                                                style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                                              ),
+
+                                                              SizedBox(height: 4),
+
+                                                              // FutureBuilder untuk nama warna
+                                                              FutureBuilder<String?>(
+                                                                future: getColorName(tempA_R[i], tempA_G[i], tempA_B[i]),
+                                                                builder: (context, snapshot) {
+                                                                  if (!snapshot.hasData) {
+                                                                    return Text(
+                                                                      "Loading...",
+                                                                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                                                                    );
+                                                                  }
+
+                                                                  return Text(
+                                                                    snapshot.data ?? "Unknown Color",
+                                                                    style: TextStyle(
+                                                                      fontSize: 12,
+                                                                      fontStyle: FontStyle.italic,
+                                                                      color: Colors.black87,
+                                                                    ),
+                                                                  );
+                                                                },
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+
+                                                        // Tombol geser kembali ke grid
                                                         IconButton(
                                                           onPressed: () {
-                                                            // Kembalikan ke avgs grid
                                                             redAvgs.add(tempA_R[i]);
                                                             greenAvgs.add(tempA_G[i]);
                                                             blueAvgs.add(tempA_B[i]);
 
-                                                            // Hapus dari tempB
                                                             tempA_R.removeAt(i);
                                                             tempA_G.removeAt(i);
                                                             tempA_B.removeAt(i);
@@ -247,7 +304,7 @@ class _AddPageState extends State<AddPage> {
                                                             setState(() {});
                                                             Navigator.pop(context);
                                                           },
-                                                          icon: Icon(Icons.double_arrow_rounded, color: Colors.white),
+                                                          icon: Icon(Icons.double_arrow_rounded, color: AppColors.fourth),
                                                         ),
                                                       ],
                                                     ),
@@ -334,7 +391,7 @@ class _AddPageState extends State<AddPage> {
                                                 onTap: () => Navigator.pop(context),
                                                 child: Icon(
                                                   Icons.cancel_rounded,
-                                                  color: AppColors.second,
+                                                  color: Colors.red,
                                                   size: 28,
                                                 ),
                                               ),
@@ -355,8 +412,8 @@ class _AddPageState extends State<AddPage> {
                                                   child: Padding(
                                                     padding: const EdgeInsets.fromLTRB(13, 5, 5, 5),
                                                     child: Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                       children: [
+                                                        // Kotak warna
                                                         Container(
                                                           width: 35,
                                                           height: 35,
@@ -371,15 +428,52 @@ class _AddPageState extends State<AddPage> {
                                                           ),
                                                         ),
 
-                                                        // === Button balikan ke grid avgs ===
+                                                        SizedBox(width: 12),
+
+                                                        // ===== COLUMN DETAIL WARNA =====
+                                                        Expanded(
+                                                          child: Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              Text(
+                                                                "R:${tempB_R[i]}  G:${tempB_G[i]}  B:${tempB_B[i]}",
+                                                                style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                                              ),
+
+                                                              SizedBox(height: 4),
+
+                                                              // FutureBuilder untuk nama warna
+                                                              FutureBuilder<String?>(
+                                                                future: getColorName(tempB_R[i], tempB_G[i], tempB_B[i]),
+                                                                builder: (context, snapshot) {
+                                                                  if (!snapshot.hasData) {
+                                                                    return Text(
+                                                                      "Loading...",
+                                                                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                                                                    );
+                                                                  }
+
+                                                                  return Text(
+                                                                    snapshot.data ?? "Unknown Color",
+                                                                    style: TextStyle(
+                                                                      fontSize: 12,
+                                                                      fontStyle: FontStyle.italic,
+                                                                      color: Colors.black87,
+                                                                    ),
+                                                                  );
+                                                                },
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+
+                                                        // Tombol geser kembali ke grid
                                                         IconButton(
                                                           onPressed: () {
-                                                            // Kembalikan ke avgs grid
                                                             redAvgs.add(tempB_R[i]);
                                                             greenAvgs.add(tempB_G[i]);
                                                             blueAvgs.add(tempB_B[i]);
 
-                                                            // Hapus dari tempB
                                                             tempB_R.removeAt(i);
                                                             tempB_G.removeAt(i);
                                                             tempB_B.removeAt(i);
@@ -387,10 +481,11 @@ class _AddPageState extends State<AddPage> {
                                                             setState(() {});
                                                             Navigator.pop(context);
                                                           },
-                                                          icon: Icon(Icons.double_arrow_rounded, color: Colors.white),
+                                                          icon: Icon(Icons.double_arrow_rounded, color: AppColors.second),
                                                         ),
                                                       ],
                                                     ),
+
                                                   ),
                                                 );
                                               }),
@@ -448,7 +543,7 @@ class _AddPageState extends State<AddPage> {
                       ),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: AppColors.third,
+                          color: Colors.white,
                           borderRadius: BorderRadius.vertical(
                             top: Radius.circular(15),
                             bottom: Radius.circular(0),
@@ -494,7 +589,7 @@ class _AddPageState extends State<AddPage> {
                                     child: Center(
                                       child: Text(
                                         'No colors added',
-                                        style: TextStyle(color: Colors.white),
+                                        style: TextStyle(color: AppColors.fourth),
                                       ),
                                     ),
                                   )
@@ -547,7 +642,7 @@ class _AddPageState extends State<AddPage> {
                                               child: Center(
                                                 child: Image.asset(
                                                   'assets/shirt.png',
-                                                  scale: 13,
+                                                  scale: 4,
                                                 ),
                                               ),
                                             ),
@@ -601,7 +696,7 @@ class _AddPageState extends State<AddPage> {
                                                             Alignment.center,
                                                         child: Image.asset(
                                                           'assets/shirt.png',
-                                                          scale: 13,
+                                                          scale: 4,
                                                         ),
                                                       ),
                                                       Align(
@@ -625,8 +720,7 @@ class _AddPageState extends State<AddPage> {
                                                           icon: Icon(
                                                             Icons
                                                                 .cancel_rounded,
-                                                            color: AppColors
-                                                                .second,
+                                                            color: Colors.red
                                                           ),
                                                         ),
                                                       ),
@@ -673,7 +767,7 @@ class _AddPageState extends State<AddPage> {
               child: Container(
                 width: screenWidth * 1,
                 height: 60,
-                color: Colors.white,
+                color: Colors.black,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -711,7 +805,7 @@ class _AddPageState extends State<AddPage> {
                       child: Text(
                         'Clear',
                         style: TextStyle(
-                          color: Colors.black,
+                          color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
@@ -827,7 +921,7 @@ class _AddPageState extends State<AddPage> {
                       child: Text(
                         'Save',
                         style: TextStyle(
-                          color: Colors.black,
+                          color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
@@ -837,7 +931,7 @@ class _AddPageState extends State<AddPage> {
                     Spacer(),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
+                        backgroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -884,7 +978,7 @@ class _AddPageState extends State<AddPage> {
                       child: Text(
                         "Sort",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.black,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),

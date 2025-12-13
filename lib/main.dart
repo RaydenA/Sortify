@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(scaffoldBackgroundColor: AppColors.third),
+      theme: ThemeData(scaffoldBackgroundColor: AppColors.first),
       debugShowCheckedModeBanner: false,
       navigatorObservers: [routeObserver],
       home: SplashScreen(),

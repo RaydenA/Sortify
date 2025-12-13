@@ -165,6 +165,15 @@ class _WifiSorterPageState extends State<WifiSorterPage> {
                             SnackBar(
                               content: Text(
                                 "Selected ESP32: ${device['ip']}",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              backgroundColor: Colors.green,
+                              duration: Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                              margin: EdgeInsets.symmetric(
+                                horizontal: 50,
+                                vertical: 10,
                               ),
                             ),
                           );
@@ -190,9 +199,9 @@ class _WifiSorterPageState extends State<WifiSorterPage> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: AppColors.third,
+      backgroundColor: AppColors.first,
       appBar: AppBar(
-        backgroundColor: AppColors.third,
+        backgroundColor: AppColors.first,
         toolbarHeight: 60,
         leadingWidth: 72,
         leading: IconButton(
@@ -232,7 +241,7 @@ class _WifiSorterPageState extends State<WifiSorterPage> {
                   height: screenHeight * 0.1,
                   padding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                   decoration: BoxDecoration(
-                    color: AppColors.fourth,
+                    color: AppColors.second,
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
@@ -244,18 +253,18 @@ class _WifiSorterPageState extends State<WifiSorterPage> {
                   ),
                   child: Row(
                     children: [
-                      Image.asset('assets/shirt.png', scale: 25),
+                      Image.asset('assets/shirt.png', scale: 8),
                       SizedBox(width: screenWidth * 0.03),
                       Text(
                         data.esp32Ip.isEmpty
                             ? "No Sorter Selected"
                             : "Selected: ${data.esp32Ip}",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.first),
                       ),
                       Spacer(),
                       IconButton(
                         onPressed: showEspModal,
-                        icon: Icon(Icons.arrow_forward_ios_rounded),
+                        icon: Icon(Icons.arrow_forward_ios_rounded, color: AppColors.first),
                       ),
                     ],
                   ),

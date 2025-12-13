@@ -11,14 +11,13 @@ class AboutPage extends StatefulWidget {
 class _AboutPageState extends State<AboutPage> {
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: AppColors.fourth,
+      backgroundColor: AppColors.first,
       appBar: AppBar(
         toolbarHeight: 60,
-        backgroundColor: AppColors.fourth,
+        backgroundColor: AppColors.first,
         leadingWidth: 72,
         leading: IconButton(
           color: Colors.black,
@@ -64,7 +63,7 @@ class _AboutPageState extends State<AboutPage> {
                 Container(
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.third,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
@@ -110,7 +109,7 @@ class _AboutPageState extends State<AboutPage> {
                         ),
                         child: Text(
                           '2702266801',
-                          style: TextStyle(fontSize: 16),
+                          style: TextStyle(fontSize: 16, color: AppColors.first),
                         ),
                       ),
                     ],
@@ -122,7 +121,7 @@ class _AboutPageState extends State<AboutPage> {
                 Container(
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.third,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
@@ -168,7 +167,7 @@ class _AboutPageState extends State<AboutPage> {
                         ),
                         child: Text(
                           '2702256271',
-                          style: TextStyle(fontSize: 16),
+                          style: TextStyle(fontSize: 16, color: AppColors.first),
                         ),
                       ),
                     ],
@@ -180,7 +179,7 @@ class _AboutPageState extends State<AboutPage> {
                 Container(
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.third,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
@@ -226,7 +225,7 @@ class _AboutPageState extends State<AboutPage> {
                         ),
                         child: Text(
                           '2702233583',
-                          style: TextStyle(fontSize: 16),
+                          style: TextStyle(fontSize: 16, color: AppColors.first),
                         ),
                       ),
                     ],
